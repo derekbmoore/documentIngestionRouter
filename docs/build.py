@@ -258,6 +258,7 @@ def build():
             "slug": slug,
             "body": body,
             "filename": fname,
+            "custom_html": meta.get("custom_html", "").lower() == "true",
         })
 
     pages.sort(key=lambda p: p["nav_order"])
@@ -274,6 +275,26 @@ def build():
 
     # Build each page
     for p in pages:
+        out_name = "index.html" if p["slug"] == "" else f'{p["slug"]}.html'
+
+        # Custom HTML pages: use companion .html file with placeholder replacement
+        if p.get("custom_html"):
+            custom_path = os.path.join(DOCS_DIR, f'{p["slug"]}.html')
+            if os.path.exists(custom_path):
+                with open(custom_path, "r") as f:
+                    page_html = f.read()
+                page_html = page_html.replace("{{NAV}}", nav_html)
+                page_html = page_html.replace("{{BASE_URL}}", BASE_URL)
+                page_html = page_html.replace("{{SITE_URL}}", SITE_URL)
+                page_html = page_html.replace("{{CURRENT_PAGE}}", p["slug"])
+                out_path = os.path.join(OUT_DIR, out_name)
+                with open(out_path, "w") as f:
+                    f.write(page_html)
+                print(f"  ✓ {out_name} (custom HTML)")
+                continue
+            else:
+                print(f"  ⚠ {p['slug']}.html not found, falling back to markdown")
+
         body_html = md_to_html(p["body"])
 
         page_html = template.replace("{{TITLE}}", p["title"])
@@ -284,7 +305,6 @@ def build():
         page_html = page_html.replace("{{SITE_URL}}", SITE_URL)
         page_html = page_html.replace("{{CURRENT_PAGE}}", p["slug"])
 
-        out_name = "index.html" if p["slug"] == "" else f'{p["slug"]}.html'
         out_path = os.path.join(OUT_DIR, out_name)
         with open(out_path, "w") as f:
             f.write(page_html)

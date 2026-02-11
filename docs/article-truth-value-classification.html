@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en" data-page="{{CURRENT_PAGE}}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth-Value Classification — Document Ingestion Router</title>
+    <meta name="description"
+        content="Truth-Value Classification and Multi-Modal Retrieval in Enterprise Document Ingestion: A Defense-in-Depth Architecture for Compliance-Aware Knowledge Systems.">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="article">
+    <meta property="og:url"
+        content="{{SITE_URL}}{{BASE_URL}}/article-truth-value-classification.html">
+    <meta property="og:title"
+        content="Truth-Value Classification and Multi-Modal Retrieval in Enterprise Document Ingestion">
+    <meta property="og:description"
+        content="A Defense-in-Depth Architecture for Compliance-Aware Knowledge Systems. Document Ingestion Router by derek brent moore.">
+    <meta property="og:image"
+        content="{{SITE_URL}}{{BASE_URL}}/assets/images/article-cover.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url"
+        content="{{SITE_URL}}{{BASE_URL}}/article-truth-value-classification.html">
+    <meta property="twitter:title"
+        content="Truth-Value Classification and Multi-Modal Retrieval in Enterprise Document Ingestion">
+    <meta property="twitter:description"
+        content="A Defense-in-Depth Architecture for Compliance-Aware Knowledge Systems. Document Ingestion Router by derek brent moore.">
+    <meta property="twitter:image"
+        content="{{SITE_URL}}{{BASE_URL}}/assets/images/article-cover.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{BASE_URL}}/style.css">
+
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true},{left: '$', right: '$', display: false}]});"></script>
+
+    <style>
+        /* === Article-specific overrides === */
+        .article { max-width: 900px; }
+
+        .article-header {
+            text-align: center;
+            margin-bottom: 3em;
+            padding-bottom: 2em;
+            border-bottom: 1px solid var(--border);
+        }
+        .article-header h1 {
+            font-size: 1.9em;
+            line-height: 1.25;
+            margin-bottom: 0.6em;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .article-meta { margin-top: 1.2em; }
+        .article-author {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2em;
+        }
+        .article-affiliation {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+        }
+        .article-badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.2em;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 20px;
+            letter-spacing: 0.03em;
+        }
+        .badge-nist {
+            color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+        .badge-fedramp {
+            color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+            border: 1px solid rgba(63, 185, 80, 0.2);
+        }
+        .badge-mit {
+            color: var(--accent-orange);
+            background: rgba(210, 153, 34, 0.1);
+            border: 1px solid rgba(210, 153, 34, 0.2);
+        }
+        .badge-mcp {
+            color: var(--accent-purple);
+            background: rgba(188, 140, 255, 0.1);
+            border: 1px solid rgba(188, 140, 255, 0.2);
+        }
+
+        /* Cover image with caption */
+        .cover-image-wrapper {
+            max-width: 800px;
+            margin: 0 auto 2.5em;
+        }
+        .cover-image {
+            width: 100%;
+            display: block;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+        .cover-caption {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            padding: 12px 20px;
+            text-align: center;
+        }
+        .cover-caption p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+        .cover-caption .caption-title { font-weight: 600; color: var(--text-secondary); }
+        .cover-caption .caption-credit { font-size: 12px; margin-top: 4px; }
+
+        /* Abstract */
+        .abstract {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin: 2em 0;
+            position: relative;
+        }
+        .abstract::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .abstract-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-blue);
+            margin-bottom: 0.8em;
+        }
+        .abstract p { font-size: 14.5px; line-height: 1.75; color: var(--text-secondary); }
+        .keywords { margin-top: 1em; font-size: 13px; color: var(--text-muted); }
+        .keywords strong { color: var(--text-secondary); }
+
+        /* Definition blocks */
+        .definition {
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--accent-blue);
+            padding: 16px 20px;
+            margin: 1.5em 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        .definition-label { font-weight: 700; color: var(--accent-blue); font-size: 14px; margin-bottom: 0.5em; }
+
+        /* Math display */
+        .math-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 1.5em 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        /* Example callout */
+        .example {
+            background: rgba(188, 140, 255, 0.05);
+            border: 1px solid rgba(188, 140, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin: 1.5em 0;
+        }
+        .example-label { font-weight: 700; color: var(--accent-purple); font-size: 13px; margin-bottom: 0.5em; }
+
+        /* Pipeline diagram */
+        .pipeline-diagram {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin: 1.5em 0;
+            overflow-x: auto;
+            text-align: center;
+        }
+        .pipeline-diagram pre {
+            background: none; border: none; padding: 0; margin: 0;
+            text-align: center; display: inline-block;
+        }
+        .pipeline-diagram pre::before { display: none; }
+        .pipeline-diagram code { background: none; border: none; color: var(--text-primary); font-size: 13px; }
+
+        /* References */
+        .references { font-size: 13.5px; line-height: 1.8; }
+        .references p {
+            padding-left: 2em; text-indent: -2em;
+            color: var(--text-secondary); margin-bottom: 0.8em;
+        }
+
+        /* Colophon */
+        .colophon {
+            margin-top: 3em; padding-top: 2em;
+            border-top: 1px solid var(--border);
+            font-size: 13px; color: var(--text-muted); font-style: italic;
+        }
+
+        /* Print */
+        @media print {
+            .article-header h1 { -webkit-text-fill-color: #111; background: none; }
+            .abstract { background: #f8f8f8; border-color: #ddd; }
+            .abstract::before { display: none; }
+            .badge { border-color: #ccc; color: #333; background: #f0f0f0; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{{BASE_URL}}/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2" />
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8" />
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            {{NAV}}
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank"
+                rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor">
+                    <path
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+
+            <!-- ============================================================ -->
+            <!-- COVER IMAGE                                                  -->
+            <!-- ============================================================ -->
+            <figure class="cover-image-wrapper">
+                <img src="{{BASE_URL}}/assets/images/article-cover.png"
+                    alt="Truth-Value Classification and Multi-Modal Retrieval — Cover illustration showing three concentric epistemic classes with TriSearch modality beams converging at a fusion point above a knowledge graph network."
+                    class="cover-image">
+                <figcaption class="cover-caption">
+                    <p class="caption-title">Figure 1. Truth-Value Classification and Triple-Modality Retrieval Architecture</p>
+                    <p>The three concentric rings represent the epistemic classification taxonomy &mdash; Class A: Immutable Truth (blue, inner), Class B: Ephemeral Stream (purple, middle), and Class C: Operational Pulse (orange, outer). Three beams converge at a fusion point representing TriSearch&trade; Reciprocal Rank Fusion across Keyword, Vector, and Graph Knowledge modalities. The underlying network depicts the entity co-occurrence knowledge graph built during ingestion.</p>
+                    <p class="caption-credit">Image: AI-generated &middot; derek brent moore, 2026 &middot; CC0 1.0 Universal</p>
+                </figcaption>
+            </figure>
+
+            <!-- ============================================================ -->
+            <!-- HEADER                                                       -->
+            <!-- ============================================================ -->
+            <header class="article-header">
+                <h1>Truth-Value Classification and Multi-Modal Retrieval in Enterprise Document Ingestion</h1>
+                <p style="font-size: 1.15em; color: var(--text-secondary); margin-top: -0.3em; margin-bottom: 1.2em;">
+                    A Defense-in-Depth Architecture for Compliance-Aware Knowledge Systems
+                </p>
+                <div class="article-meta">
+                    <div class="article-author">derek brent moore</div>
+                    <div class="article-affiliation">open source &middot; mit license</div>
+                </div>
+                <div class="article-badges">
+                    <span class="badge badge-nist">NIST AI RMF</span>
+                    <span class="badge badge-fedramp">FedRAMP High</span>
+                    <span class="badge badge-mcp">MCP Server</span>
+                    <span class="badge badge-mit">MIT License</span>
+                </div>
+            </header>
+
+            <!-- ============================================================ -->
+            <!-- ABSTRACT                                                     -->
+            <!-- ============================================================ -->
+            <div class="abstract">
+                <div class="abstract-label">Abstract</div>
+                <p>Enterprise knowledge management systems face a fundamental tension: the need to ingest heterogeneous document corpora at scale while simultaneously enforcing fine-grained access control, regulatory compliance, and semantic fidelity. This paper presents the Document Ingestion Router, an open-source Model Context Protocol (MCP) server that addresses this tension through three novel contributions. First, we introduce a <em>truth-value classification</em> taxonomy that partitions documents into three epistemic classes &mdash; Immutable Truth, Ephemeral Stream, and Operational Pulse &mdash; each governed by distinct extraction engines, temporal decay functions, and compliance policies. Second, we describe <em>TriSearch&trade;</em>, a triple-modality retrieval architecture that fuses keyword (BM25), vector (cosine similarity over dense embeddings), and graph knowledge (named-entity co-occurrence traversal) results via Reciprocal Rank Fusion (RRF). Third, we formalize a <em>Resource Access Policy</em> (RAP) that enforces four-layer security isolation &mdash; tenant, project, team, and user &mdash; at the SQL query level, ensuring zero cross-tenant data leakage by construction.</p>
+                <div class="keywords"><strong>Keywords:</strong> document ingestion, truth-value classification, multi-modal retrieval, reciprocal rank fusion, knowledge graphs, enterprise security, NIST AI RMF, FedRAMP, MCP server, context ecology</div>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- 1. INTRODUCTION                                              -->
+            <!-- ============================================================ -->
+            <h2 id="introduction">1. Introduction</h2>
+
+            <h3 id="enterprise-document-problem">1.1 The Enterprise Document Problem</h3>
+            <p>Modern enterprises generate and consume documents at extraordinary volume and variety. A single organization may simultaneously manage immutable technical specifications (PDFs of engineering standards), ephemeral collaborative content (email threads, slide decks, wiki pages), and high-velocity operational data (telemetry logs, CSV exports, JSON event streams). These document types differ not only in format but in <em>epistemic character</em> &mdash; the degree to which their content represents stable, authoritative knowledge versus transient, contextual information.</p>
+            <p>Existing document processing systems treat this heterogeneity as a format problem, dispatching documents to parsers based solely on MIME type or file extension. This approach is insufficient because it conflates the <em>structural</em> properties of a document (how to parse it) with its <em>epistemic</em> properties (how to govern, weight, and decay it over time). A PDF containing a NIST Special Publication and a PDF containing meeting minutes require identical parsing but radically different governance, retention, and search-ranking behavior.</p>
+
+            <h3 id="retrieval-gap">1.2 The Retrieval Gap</h3>
+            <p>Enterprise retrieval systems have converged on dense vector search as a default modality. While vector search excels at discovering semantically related content across terminological boundaries, it suffers from well-documented limitations: poor handling of exact-match queries, inability to exploit structured entity relationships, and opacity of ranking explanations (Robertson &amp; Zaragoza, 2009; Karpukhin et al., 2020).</p>
+            <p>Keyword search via inverted indices (BM25, tsvector/tsquery) addresses exact-match requirements but misses conceptual similarity. Knowledge graph traversal captures entity relationships and provenance chains but operates on a fundamentally different abstraction. No single modality provides comprehensive recall across all enterprise query types.</p>
+
+            <h3 id="compliance-imperative">1.3 The Compliance Imperative</h3>
+            <p>Federal agencies and regulated industries increasingly require AI-adjacent systems &mdash; including document processing pipelines and RAG backends &mdash; to conform to frameworks such as the NIST AI Risk Management Framework (AI RMF), FedRAMP, and NIST SP 800-60. These frameworks mandate provenance tracking (MAP 1.5), data governance classification (MANAGE 2.3), extraction quality auditability (MEASURE 2.1), and explicit policy governance (GOVERN 1.1). Few document ingestion systems are designed with these controls as first-class architectural constraints.</p>
+
+            <h3 id="contributions">1.4 Contributions</h3>
+            <ol>
+                <li><strong>Truth-Value Classification (Section 3):</strong> A three-class taxonomy &mdash; Immutable Truth (Class A), Ephemeral Stream (Class B), Operational Pulse (Class C) &mdash; governing extraction engine selection, temporal decay rate, and compliance policy.</li>
+                <li><strong>TriSearch: Triple-Modality Retrieval with RRF (Section 4):</strong> Keyword, vector, and graph knowledge searches fused via Reciprocal Rank Fusion.</li>
+                <li><strong>Resource Access Policy (Section 5):</strong> Four-layer security &mdash; tenant, project, team, user &mdash; enforced at the SQL query level, with mandatory tenant isolation.</li>
+            </ol>
+
+            <!-- ============================================================ -->
+            <!-- 2. RELATED WORK                                              -->
+            <!-- ============================================================ -->
+            <h2 id="related-work">2. Related Work</h2>
+
+            <h3 id="document-processing-pipelines">2.1 Document Processing Pipelines</h3>
+            <p>Document processing has evolved from simple format-based parsing (Apache Tika, textract) to sophisticated layout-aware extraction. IBM Docling (Auer et al., 2023) provides high-fidelity PDF processing with TableFormer-based table reconstruction. Unstructured.io offers semantic chunking with header-based splitting. These systems operate at the extraction layer but do not address classification, governance, or multi-modal indexing.</p>
+
+            <h3 id="multi-modal-retrieval">2.2 Multi-Modal Retrieval</h3>
+            <p>Reciprocal Rank Fusion (Cormack et al., 2009) provides a parameter-light method for combining ranked lists: $\text{RRF}(d) = \sum_{r \in R} \frac{1}{k + r(d)}$. Recent hybrid systems combine sparse and dense retrievers (Ma et al., 2023), but the addition of graph-based retrieval as a third modality remains underexplored. GraphRAG (Edge et al., 2024) explores graph-augmented retrieval but does not integrate keyword and vector modalities into a unified fusion framework.</p>
+
+            <h3 id="ai-governance-frameworks">2.3 AI Governance Frameworks</h3>
+            <p>The NIST AI RMF (NIST AI 100-1, 2023) establishes four core functions &mdash; Govern, Map, Measure, and Manage. FedRAMP specifies security baselines including AU-2 (audit events), SC-28 (encryption at rest), SC-8 (transport security), and AC-2/AC-6 (access control). To our knowledge, no existing open-source document ingestion system implements these frameworks as architectural constraints with traceable control-to-code mappings.</p>
+
+            <!-- ============================================================ -->
+            <!-- 3. TRUTH-VALUE CLASSIFICATION                                -->
+            <!-- ============================================================ -->
+            <h2 id="truth-value-classification">3. Truth-Value Classification</h2>
+
+            <h3 id="epistemological-foundation">3.1 Epistemological Foundation</h3>
+            <p>Enterprise documents occupy distinct positions on an epistemic stability spectrum. Technical standards represent <em>immutable truth</em>; emails and wikis represent <em>ephemeral stream</em> content; telemetry logs represent <em>operational pulse</em> data.</p>
+
+            <div class="definition">
+                <div class="definition-label">Definition 1 (Truth-Value Classification)</div>
+                <p>Let $\mathcal{D}$ be the set of all documents. We define $\phi: \mathcal{D} \rightarrow \{A, B, C\}$:</p>
+                <ul>
+                    <li><strong>Class A (Immutable Truth):</strong> Stable, authoritative knowledge. Decay rate $\lambda_A = 0.01$.</li>
+                    <li><strong>Class B (Ephemeral Stream):</strong> Contextual, collaborative knowledge. Decay rate $\lambda_B = 0.50$.</li>
+                    <li><strong>Class C (Operational Pulse):</strong> Transient operational data. Decay rate $\lambda_C = 0.90$.</li>
+                </ul>
+            </div>
+
+            <p>The decay rate governs a time-dependent relevance function:</p>
+            <div class="math-block">
+                $$\text{relevance}(d, t) = e^{-\lambda_{\phi(d)} \cdot (t - t_{\text{ingest}}(d))}$$
+            </div>
+
+            <h3 id="classification-mechanism">3.2 Classification Mechanism</h3>
+            <p><strong>Phase 1: Extension-Based Classification.</strong> Three disjoint extension sets: $E_A = \{\texttt{.pdf}, \texttt{.scidoc}\}$, $E_B = \{\texttt{.pptx}, \texttt{.docx}, \texttt{.eml}, \texttt{.html}, \texttt{.md}, \texttt{.txt}\}$, $E_C = \{\texttt{.csv}, \texttt{.parquet}, \texttt{.json}, \texttt{.xlsx}, \texttt{.log}\}$.</p>
+            <p><strong>Phase 2: Keyword Escalation.</strong> Class B files with truth-indicating keywords ($K_T = \{\text{manual}, \text{spec}, \text{standard}, \text{nist}, \text{fedramp}, \ldots\}$) are escalated to Class A.</p>
+            <div class="math-block">
+                $$\phi(d) = \begin{cases} A & \text{if } \text{ext}(d) \in E_A \\ C & \text{if } \text{ext}(d) \in E_C \\ A & \text{if } \text{ext}(d) \in E_B \wedge \exists k \in K_T : k \subseteq \text{name}(d) \\ B & \text{otherwise} \end{cases}$$
+            </div>
+
+            <h3 id="engine-routing">3.3 Engine Routing</h3>
+            <div class="table-wrap"><table>
+                <tr><th>Class</th><th>Engine</th><th>Rationale</th></tr>
+                <tr><td>A</td><td>IBM Docling</td><td>High-fidelity layout analysis, TableFormer table reconstruction, bounding box provenance</td></tr>
+                <tr><td>B</td><td>Unstructured.io</td><td>Semantic chunking with header-based splitting, element type detection</td></tr>
+                <tr><td>C</td><td>Pandas</td><td>Native structured data handling with column preservation, row-level chunking</td></tr>
+            </table></div>
+            <p>Fallback: if Docling is unavailable, Class A degrades to Unstructured for resilience.</p>
+
+            <h3 id="sensitivity-classification">3.4 Sensitivity Classification</h3>
+            <p>Orthogonal to truth-value, documents receive NIST SP 800-60 sensitivity levels:</p>
+            <ul>
+                <li><strong>High:</strong> Credentials, PII, PHI, CUI &rarr; <code>requires_encryption = true</code> (AES-256, FedRAMP SC-28)</li>
+                <li><strong>Moderate:</strong> Proprietary, internal, confidential, draft content</li>
+                <li><strong>Low:</strong> Default</li>
+            </ul>
+
+            <h3 id="provenance-enrichment">3.5 Provenance Enrichment</h3>
+            <pre><code class="language-python">ChunkMetadata {
+    provenance_id:         "{class_prefix}-{uuid}"
+    data_class:            "immutable_truth" | "ephemeral_stream" | "operational_pulse"
+    source_file:           filename
+    ingested_at:           ISO 8601 timestamp
+    decay_rate:            &lambda; &isin; {0.01, 0.50, 0.90}
+    sensitivity_level:     "high" | "moderate" | "low"
+    data_categories:       ["pii", "phi", "cui", ...]
+    compliance_frameworks: ["NIST AI RMF", "FedRAMP", ...]
+    user_id / tenant_id / project_id / access_level / acl_groups
+}</code></pre>
+
+            <!-- ============================================================ -->
+            <!-- 4. TRISEARCH                                                 -->
+            <!-- ============================================================ -->
+            <h2 id="trisearch">4. TriSearch: Triple-Modality Retrieval</h2>
+
+            <h3 id="trisearch-architecture">4.1 Architecture</h3>
+            <ol>
+                <li><strong>Keyword (KW):</strong> PostgreSQL <code>tsvector</code>/<code>tsquery</code> with <code>ts_rank()</code>. Exact-term matching.</li>
+                <li><strong>Vector (VEC):</strong> pgvector cosine similarity, Azure OpenAI <code>text-embedding-ada-002</code> (1536-dim). Semantic retrieval.</li>
+                <li><strong>Graph Knowledge (GK):</strong> spaCy NER &rarr; property graph &rarr; trigram similarity traversal. Relationship discovery.</li>
+            </ol>
+
+            <h3 id="knowledge-graph-construction">4.2 Knowledge Graph Construction</h3>
+            <p><strong>Step 1:</strong> spaCy NER on chunk text (5,000 char limit, &gt;2 char filter).</p>
+            <p><strong>Step 2:</strong> Deduplicated entities become graph nodes (label, type, document_ids, tenant_id).</p>
+            <p><strong>Step 3:</strong> Sliding window of 5 entities creates co-occurrence edges with weight increment.</p>
+            <p><strong>Step 4:</strong> Bidirectional document linking via <code>document_ids</code> arrays.</p>
+            <p>Stored in PostgreSQL (<code>graph_nodes</code>, <code>graph_edges</code>) with JSONB properties and <code>pg_trgm</code> trigram matching.</p>
+
+            <h3 id="reciprocal-rank-fusion">4.3 Reciprocal Rank Fusion</h3>
+            <div class="math-block">
+                $$\text{RRF}(c) = \sum_{i=1}^{3} \frac{1}{k + r_i(c)} \qquad k = 60$$
+            </div>
+            <ul>
+                <li><strong>Parameter-light:</strong> Only $k$ requires tuning.</li>
+                <li><strong>Score-agnostic:</strong> Operates on ranks, not raw scores.</li>
+                <li><strong>Modality-balanced:</strong> Prevents single-modality domination.</li>
+            </ul>
+
+            <div class="example">
+                <div class="example-label">Example</div>
+                <p>Chunk at rank 1 (keyword), 3 (vector), 5 (graph):</p>
+                <div class="math-block">
+                    $$\text{RRF} = \frac{1}{61} + \frac{1}{63} + \frac{1}{65} = 0.0164 + 0.0159 + 0.0154 = 0.0477$$
+                </div>
+                <p>vs. rank 1 in one modality only: $\frac{1}{61} = 0.0164$. RRF rewards cross-modality evidence.</p>
+            </div>
+
+            <h3 id="modality-degradation">4.4 Modality Degradation</h3>
+            <p>TriSearch degrades gracefully. <code>SearchResponse</code> always reports per-modality counts, satisfying NIST AI RMF MEASURE 2.1.</p>
+
+            <!-- ============================================================ -->
+            <!-- 5. RESOURCE ACCESS POLICY                                    -->
+            <!-- ============================================================ -->
+            <h2 id="resource-access-policy">5. Resource Access Policy</h2>
+
+            <h3 id="security-model">5.1 Security Model</h3>
+            <p><strong>Layer 1: Tenant Isolation (Mandatory).</strong> <code>tenant_id</code> enforced unconditionally at SQL level. Cannot be bypassed by admins.</p>
+            <p><strong>Layer 2: RBAC.</strong> Six roles: Admin, Analyst, PM, Viewer, Developer, Agent.</p>
+            <p><strong>Layer 3: Project Scope.</strong> <code>project_id</code> matching when <code>access_level = "project"</code>.</p>
+            <p><strong>Layer 4: ACL Groups.</strong> OIDC <code>groups</code> claim overlap when <code>access_level = "team"</code>.</p>
+
+            <h3 id="access-level-hierarchy">5.2 Access Level Hierarchy</h3>
+            <div class="table-wrap"><table>
+                <tr><th>Level</th><th>Access Rule</th></tr>
+                <tr><td><code>private</code></td><td>Owner only</td></tr>
+                <tr><td><code>team</code></td><td>Owner + shared <code>acl_groups</code></td></tr>
+                <tr><td><code>project</code></td><td>Owner + shared <code>project_id</code></td></tr>
+                <tr><td><code>tenant</code></td><td>All authenticated users in tenant</td></tr>
+            </table></div>
+
+            <h3 id="sql-level-enforcement">5.3 SQL-Level Enforcement</h3>
+            <pre><code class="language-python"># MANDATORY: Tenant isolation (always applied)
+query = query.where(model.tenant_id == ctx.tenant_id)
+
+# Admin override within tenant
+if Role.ADMIN in ctx.roles:
+    return query
+
+# Non-admin: composite access level filter
+conditions = [
+    model.user_id == ctx.user_id,           # Own resources
+    model.access_level == "tenant",          # Tenant-wide
+]
+if can_access_system_resources(ctx):
+    conditions.append(model.user_id == "system")
+if ctx.project_id:
+    conditions.append(and_(model.access_level == "project",
+                           model.project_id == ctx.project_id))
+if ctx.groups:
+    conditions.append(and_(model.access_level == "team",
+                           model.acl_groups.overlap(ctx.groups)))
+
+query = query.where(or_(*conditions))</code></pre>
+
+            <h3 id="audit-trail">5.4 Audit Trail</h3>
+            <pre><code class="language-json">{
+    "event_type": "resource.ingest",
+    "timestamp": "2026-02-11T20:00:00Z",
+    "user_id": "user-123",
+    "tenant_id": "tenant-a",
+    "action": "ingest",
+    "resource": "doc-abc123",
+    "outcome": "success",
+    "details": { "filename": "nist-800-53.pdf", "chunks": 142 }
+}</code></pre>
+            <p>Implements FedRAMP AU-2 and NIST AI RMF MANAGE 4.2. Structured JSON, SIEM-compatible.</p>
+
+            <!-- ============================================================ -->
+            <!-- 6. SYSTEM ARCHITECTURE                                       -->
+            <!-- ============================================================ -->
+            <h2 id="system-architecture">6. System Architecture</h2>
+
+            <h3 id="pipeline-overview">6.1 Pipeline Overview</h3>
+            <div class="pipeline-diagram">
+                <pre><code>[Source] &rarr; [Classify] &rarr; [Extract] &rarr; [Embed] &rarr; [Index]
+   &darr;           &darr;            &darr;          &darr;         &darr;
+Connector   Class A/B/C  Docling/   Azure    KW (tsvector)
+(16 types)  + Sensitivity Unstr./   OpenAI   VEC (pgvector)
+                         Pandas    ada-002   GK (spaCy NER)</code></pre>
+            </div>
+
+            <h3 id="technology-stack">6.2 Technology Stack</h3>
+            <div class="table-wrap"><table>
+                <tr><th>Layer</th><th>Technology</th><th>Justification</th></tr>
+                <tr><td>Language</td><td>Python 3.11</td><td>NLP, ML, data processing ecosystem</td></tr>
+                <tr><td>Framework</td><td>FastAPI + Uvicorn</td><td>Async-native, OpenAPI, type-safe</td></tr>
+                <tr><td>Database</td><td>PostgreSQL 16 + pgvector + pg_trgm</td><td>Unified relational, vector, FTS, graph store</td></tr>
+                <tr><td>Embeddings</td><td>Azure OpenAI (ada-002)</td><td>1536-dim, Azure Gov compatible</td></tr>
+                <tr><td>NER</td><td>spaCy (en_core_web_sm)</td><td>Fast named entity recognition</td></tr>
+                <tr><td>Workflows</td><td>Temporal</td><td>Durable execution with retry</td></tr>
+                <tr><td>Memory</td><td>Zep</td><td>Episodic memory management</td></tr>
+                <tr><td>Containers</td><td>Docker Compose (6 services)</td><td>Reproducible deployment</td></tr>
+                <tr><td>Infrastructure</td><td>Azure Bicep</td><td>FedRAMP-authorized (commercial + GovCloud)</td></tr>
+            </table></div>
+            <p>PostgreSQL serves as a <em>unified data substrate</em> for all four modalities, eliminating the need for separate Elasticsearch, Pinecone, and Neo4j instances.</p>
+
+            <h3 id="durable-execution">6.3 Durable Execution</h3>
+            <p>Temporal decomposes the pipeline into five activities with independent retry policies (exponential backoff, 3 attempts, 1&ndash;30 min timeouts).</p>
+
+            <!-- ============================================================ -->
+            <!-- 7. CONNECTORS                                                -->
+            <!-- ============================================================ -->
+            <h2 id="connector-architecture">7. Connector Architecture</h2>
+            <pre><code class="language-python">class BaseConnector(ABC):
+    async def connect(self) -> bool: ...
+    async def list_documents(self) -> List[Dict[str, Any]]: ...
+    async def fetch_document(self, doc_id: str, dest_path: str) -> str: ...
+    async def disconnect(self): ...</code></pre>
+            <div class="table-wrap"><table>
+                <tr><th>Category</th><th>Connectors</th><th>#</th></tr>
+                <tr><td>Cloud Storage</td><td>AWS S3, Azure Blob, GCS</td><td>3</td></tr>
+                <tr><td>Collaboration</td><td>SharePoint, Google Drive, OneDrive, Confluence</td><td>4</td></tr>
+                <tr><td>Ticketing</td><td>ServiceNow, Jira, GitHub</td><td>3</td></tr>
+                <tr><td>Messaging</td><td>Slack, Teams, Email (IMAP)</td><td>3</td></tr>
+                <tr><td>Data &amp; Integration</td><td>Database, Webhooks, Local Upload</td><td>3</td></tr>
+            </table></div>
+
+            <!-- ============================================================ -->
+            <!-- 8. COMPLIANCE                                                -->
+            <!-- ============================================================ -->
+            <h2 id="compliance-mapping">8. Compliance Mapping</h2>
+
+            <h3 id="nist-ai-rmf">8.1 NIST AI RMF</h3>
+            <div class="table-wrap"><table>
+                <tr><th>Control</th><th>Function</th><th>Implementation</th></tr>
+                <tr><td>MAP 1.5</td><td>Context &amp; Boundaries</td><td>Provenance ID, source file, timestamps, entity relationships on every chunk</td></tr>
+                <tr><td>MANAGE 2.3</td><td>Data Governance</td><td>Classification determines engine, decay rate, policy</td></tr>
+                <tr><td>MEASURE 2.1</td><td>Data Quality</td><td>Confidence scores, structured metadata, per-modality search counts</td></tr>
+                <tr><td>GOVERN 1.1</td><td>Policies</td><td>Pydantic-validated config, FIPS toggle, encryption flag</td></tr>
+                <tr><td>GOVERN 1.2</td><td>Accountability</td><td>Structured audit logging on every request</td></tr>
+                <tr><td>MANAGE 4.2</td><td>Audit</td><td>Comprehensive event types: security, resource, graph, agent, connector, admin</td></tr>
+            </table></div>
+
+            <h3 id="fedramp-high">8.2 FedRAMP High</h3>
+            <div class="table-wrap"><table>
+                <tr><th>Control</th><th>Baseline</th><th>Implementation</th></tr>
+                <tr><td>AU-2</td><td>Audit Events</td><td>AuditMiddleware: timestamp, method, path, IP, status, duration</td></tr>
+                <tr><td>SC-28</td><td>Encryption at Rest</td><td>High sensitivity &rarr; <code>requires_encryption</code>; AES-256</td></tr>
+                <tr><td>SC-8</td><td>Transport Security</td><td>TLS 1.3 required; FIPS 140-2 support</td></tr>
+                <tr><td>AC-2</td><td>Access Control</td><td>Mandatory tenant isolation; six RBAC roles</td></tr>
+                <tr><td>AC-6</td><td>Least Privilege</td><td>Row-level <code>acl_groups</code>; private &rarr; team &rarr; project &rarr; tenant</td></tr>
+            </table></div>
+
+            <!-- ============================================================ -->
+            <!-- 9. DISCUSSION                                                -->
+            <!-- ============================================================ -->
+            <h2 id="discussion">9. Discussion</h2>
+
+            <h3 id="limitations">9.1 Limitations and Future Work</h3>
+            <p><strong>Classification Granularity.</strong> Content-based classification using lightweight LMs would improve accuracy beyond filename heuristics.</p>
+            <p><strong>Graph Sophistication.</strong> Richer relationship extraction (&ldquo;authored by,&rdquo; &ldquo;supersedes,&rdquo; &ldquo;references&rdquo;) would improve graph search precision.</p>
+            <p><strong>Decay Calibration.</strong> Empirical calibration against real enterprise usage patterns would improve relevance weighting.</p>
+            <p><strong>Scalability.</strong> At massive scale, partitioning strategies, HNSW indexes, or read replicas may be required.</p>
+
+            <h3 id="implications">9.2 Implications for AI Data Pipelines</h3>
+            <p>Documents of different epistemic classes should receive different treatment during RAG generation. An LLM should weight a Class A specification more heavily than a Class C log. Access control must be enforced at the retrieval level &mdash; SQL-level enforcement provides this guarantee by construction.</p>
+
+            <h3 id="context-ecology">9.3 The Context Ecology Vision</h3>
+            <p>The Document Ingestion Router serves as the &ldquo;sensory organ&rdquo; of the Context Ecology (ctxEco) platform &mdash; transforming raw enterprise documents into classified, indexed, and governed knowledge chunks that agents can query, reason over, and synthesize.</p>
+
+            <!-- ============================================================ -->
+            <!-- 10. CONCLUSION                                               -->
+            <!-- ============================================================ -->
+            <h2 id="conclusion">10. Conclusion</h2>
+            <p>We have presented an architecture that unifies truth-value classification, triple-modality retrieval, and defense-in-depth access control. PostgreSQL serves as a unified data substrate for relational, full-text, vector, and graph workloads, eliminating multi-database complexity. The system demonstrates that compliance-aware AI data pipelines need not sacrifice developer ergonomics or architectural simplicity.</p>
+
+            <!-- ============================================================ -->
+            <!-- REFERENCES                                                   -->
+            <!-- ============================================================ -->
+            <h2 id="references">References</h2>
+            <div class="references">
+                <p>Auer, C., et al. (2023). Docling Technical Report. IBM Research. arXiv:2408.09869.</p>
+                <p>Cormack, G. V., Clarke, C. L. A., &amp; Buettcher, S. (2009). Reciprocal rank fusion outperforms condorcet and individual rank learning methods. <em>Proc. 32nd ACM SIGIR</em>, 758&ndash;759.</p>
+                <p>Edge, D., et al. (2024). From Local to Global: A Graph RAG Approach to Query-Focused Summarization. Microsoft Research. arXiv:2404.16130.</p>
+                <p>Karpukhin, V., et al. (2020). Dense Passage Retrieval for Open-Domain QA. <em>EMNLP 2020</em>, 6769&ndash;6781.</p>
+                <p>Ma, X., et al. (2023). Fine-Tuning LLaMA for Multi-Stage Text Retrieval. arXiv:2310.08319.</p>
+                <p>NIST. (2023). AI Risk Management Framework 1.0. NIST AI 100-1.</p>
+                <p>NIST. (2008). Guide for Mapping Types of Information and Information Systems to Security Categories. SP 800-60 Vol. 1 Rev. 1.</p>
+                <p>Robertson, S., &amp; Zaragoza, H. (2009). The Probabilistic Relevance Framework: BM25 and Beyond. <em>FnTIR</em>, 3(4), 333&ndash;389.</p>
+            </div>
+
+            <!-- ============================================================ -->
+            <!-- COLOPHON                                                     -->
+            <!-- ============================================================ -->
+            <div class="colophon">
+                This paper describes the Document Ingestion Router, an open-source component of the Context Ecology (ctxEco) platform by derek brent moore. The software is available under the MIT license at <a href="https://github.com/derekbmoore/documentIngestionRouter">github.com/derekbmoore/documentIngestionRouter</a>.
+            </div>
+
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> &middot; MIT License &middot; <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">&uarr;</button>
+
+    <!-- Syntax highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === document.documentElement.dataset.page) link.classList.add('active');
+        });
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => btn.classList.toggle('visible', window.scrollY > 400));
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        // Prism
+        Prism.highlightAll();
+    </script>
+</body>
+</html>
