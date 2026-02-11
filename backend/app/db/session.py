@@ -21,7 +21,7 @@ async def init_db():
         await conn.execute(
             __import__("sqlalchemy").text("CREATE EXTENSION IF NOT EXISTS pg_trgm")
         )
-        await conn.create_all(Base.metadata)
+        await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_db() -> AsyncSession:

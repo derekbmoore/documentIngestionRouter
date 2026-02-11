@@ -2,62 +2,62 @@
 # =================================================
 
 # Core
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-pydantic==2.10.4
-pydantic-settings==2.7.1
-python-multipart==0.0.20
-python-dotenv==1.0.1
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.34,<1.0
+pydantic>=2.10,<3.0
+pydantic-settings>=2.7,<3.0
+python-multipart>=0.0.20
+python-dotenv>=1.0,<2.0
 
 # Database
-sqlalchemy[asyncio]==2.0.36
-asyncpg==0.30.0
-alembic==1.14.1
-pgvector==0.3.6
+sqlalchemy[asyncio]>=2.0.36,<3.0
+asyncpg>=0.30,<1.0
+alembic>=1.14,<2.0
+pgvector>=0.3,<1.0
 
 # Extraction Engines
-docling==2.16.0
-unstructured[all-docs]==0.16.17
-pandas==2.2.3
-openpyxl==3.1.5
+docling>=2.14,<3.0
+unstructured>=0.16,<1.0
+pandas>=2.2,<3.0
+openpyxl>=3.1,<4.0
 
 # Embeddings
-openai==1.59.5
-tiktoken==0.8.0
+openai>=1.59,<2.0
+tiktoken>=0.8,<1.0
 
 # Graph / NLP
-spacy==3.8.4
+spacy>=3.7,<4.0
 
 # Memory
-zep-python==2.0.2
+zep-python>=2.0,<3.0
 
 # Temporal
-temporalio==1.9.0
+temporalio>=1.9,<2.0
 
 # Connectors
-boto3==1.36.6                # AWS S3
-azure-storage-blob==12.24.1  # Azure Blob
-azure-identity==1.19.0       # Azure AD / Managed Identity
-google-cloud-storage==2.19.0 # GCS
-msal==1.32.0                 # SharePoint / OneDrive / Teams OAuth
-Office365-REST-Python-Client==2.5.13  # SharePoint
-atlassian-python-api==3.41.16  # Confluence / Jira
-slack-sdk==3.34.0            # Slack
-pymsteams==0.2.3             # Teams
-pygithub==2.5.0              # GitHub
-pyservicenow==0.3.9          # ServiceNow (REST)
-imapclient==3.0.1            # Email IMAP
-python-magic==0.4.27         # MIME detection
+boto3>=1.36,<2.0               # AWS S3
+azure-storage-blob>=12.24,<13  # Azure Blob
+azure-identity>=1.19,<2.0      # Azure AD / Managed Identity
+google-cloud-storage>=2.19,<3  # GCS
+msal>=1.32,<2.0                # SharePoint / OneDrive / Teams OAuth
+Office365-REST-Python-Client>=2.5,<3.0  # SharePoint
+atlassian-python-api>=3.41,<4.0  # Confluence / Jira
+slack-sdk>=3.34,<4.0           # Slack
+pymsteams>=0.2,<1.0            # Teams
+pygithub>=2.5,<3.0             # GitHub
+requests>=2.31,<3.0            # ServiceNow (REST)
+imapclient>=3.0,<4.0           # Email IMAP
+python-magic>=0.4,<1.0         # MIME detection
 
 # Security / Compliance
-cryptography==44.0.0
-pyjwt[crypto]==2.10.1
+cryptography>=44,<45
+pyjwt[crypto]>=2.10,<3.0
 
 # Observability
-structlog==24.4.0
-prometheus-client==0.21.1
+structlog>=24.4,<25
+prometheus-client>=0.21,<1.0
 
 # Testing
-pytest==8.3.4
-pytest-asyncio==0.25.2
-httpx==0.28.1
+pytest>=8.3,<9.0
+pytest-asyncio>=0.25,<1.0
+httpx>=0.28,<1.0
