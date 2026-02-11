@@ -231,6 +231,14 @@ def build():
     css_dst = os.path.join(OUT_DIR, "style.css")
     shutil.copy2(css_src, css_dst)
 
+    # Copy assets
+    assets_src = os.path.join(DOCS_DIR, "assets")
+    assets_dst = os.path.join(OUT_DIR, "assets")
+    if os.path.exists(assets_src):
+        if os.path.exists(assets_dst):
+            shutil.rmtree(assets_dst)
+        shutil.copytree(assets_src, assets_dst)
+
     # Collect pages
     pages = []
     for fname in os.listdir(DOCS_DIR):
