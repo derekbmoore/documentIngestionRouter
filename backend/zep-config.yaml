@@ -1,0 +1,23 @@
+# Zep Configuration for Document Ingestion Router
+server:
+  host: 0.0.0.0
+  port: 8000
+
+store:
+  type: postgres
+  postgres:
+    dsn: postgresql://dir_admin:changeme@postgres:5432/doc_ingestion?sslmode=disable
+
+memory:
+  message_window: 12
+
+extractors:
+  documents:
+    enabled: true
+  entities:
+    enabled: true
+  intent:
+    enabled: false
+
+log:
+  level: info
