@@ -38,6 +38,13 @@ class Document(Base):
     tenant_id = Column(String(64), index=True)
     user_id = Column(String(64))
     acl_groups = Column(ARRAY(String), default=[])
+
+    # Security: project/team/access scoping
+    project_id = Column(String(64), index=True)
+    team_id = Column(String(64), index=True)
+    tags = Column(ARRAY(String), default=[])
+    access_level = Column(String(16), default="team")  # private|team|project|tenant
+
     chunk_count = Column(Integer, default=0)
     file_size_bytes = Column(Integer, default=0)
     mime_type = Column(String(128))
@@ -48,6 +55,7 @@ class Document(Base):
 
     __table_args__ = (
         Index("ix_documents_tenant_class", "tenant_id", "data_class"),
+        Index("ix_documents_access", "tenant_id", "access_level", "project_id"),
     )
 
 
@@ -66,6 +74,12 @@ class ChunkRecord(Base):
     provenance_id = Column(String(32))
     decay_rate = Column(Float, default=0.5)
     tenant_id = Column(String(64), index=True)
+    user_id = Column(String(64))
+
+    # Security: project/access scoping (inherited from parent document)
+    project_id = Column(String(64), index=True)
+    access_level = Column(String(16), default="team")
+    acl_groups = Column(ARRAY(String), default=[])
 
     # Full-text search vector (auto-populated by trigger)
     search_vector = Column(TSVECTOR)
@@ -81,6 +95,7 @@ class ChunkRecord(Base):
               postgresql_with={"lists": 100},
               postgresql_ops={"embedding": "vector_cosine_ops"}),
         Index("ix_chunks_tenant_class", "tenant_id", "data_class"),
+        Index("ix_chunks_access", "tenant_id", "access_level", "project_id"),
     )
 
 
@@ -94,10 +109,15 @@ class GraphNodeRecord(Base):
     properties = Column(JSONB, default={})
     document_ids = Column(ARRAY(String), default=[])
     tenant_id = Column(String(64), index=True)
+    user_id = Column(String(64))
+    project_id = Column(String(64), index=True)
+    access_level = Column(String(16), default="team")
+    acl_groups = Column(ARRAY(String), default=[])
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
         Index("ix_graph_nodes_label", "label"),
+        Index("ix_graph_nodes_access", "tenant_id", "access_level"),
     )
 
 
@@ -112,6 +132,9 @@ class GraphEdgeRecord(Base):
     weight = Column(Float, default=1.0)
     properties = Column(JSONB, default={})
     tenant_id = Column(String(64), index=True)
+    user_id = Column(String(64))
+    project_id = Column(String(64))
+    access_level = Column(String(16), default="team")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
@@ -136,6 +159,10 @@ class ConnectorRecord(Base):
     docs_ingested = Column(Integer, default=0)
     error_message = Column(Text)
     tenant_id = Column(String(64), index=True)
+    user_id = Column(String(64))
+    project_id = Column(String(64), index=True)
+    access_level = Column(String(16), default="team")
+    acl_groups = Column(ARRAY(String), default=[])
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -150,6 +177,8 @@ class AuditLog(Base):
     resource_id = Column(String(64))
     user_id = Column(String(64))
     tenant_id = Column(String(64))
+    project_id = Column(String(64))
+    agent_id = Column(String(64))
     details = Column(JSONB, default={})
     ip_address = Column(String(45))
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)

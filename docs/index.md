@@ -2,22 +2,15 @@
 layout: default
 title: Home
 nav_order: 1
-description: "Intelligent document classification, extraction, and TriSearch™ indexing for enterprise workloads."
+description: "Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing."
 permalink: /
 ---
 
 # Document Ingestion Router
 
-{: .fs-9 }
-
 Intelligent document classification, extraction, and TriSearch™ indexing for enterprise workloads.
-{: .fs-6 .fw-300 }
 
-Part of the [Context Ecology (ctxEco)](https://github.com/derekbmoore) platform by **Zimax Networks LC**.
-{: .fs-4 .fw-300 }
-
-[Get Started](/documentIngestionRouter/getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View on GitHub](https://github.com/derekbmoore/documentIngestionRouter){: .btn .fs-5 .mb-4 .mb-md-0 }
+An open-source MCP server created by [Derek Brent Moore](https://github.com/derekbmoore).
 
 ---
 
@@ -35,6 +28,7 @@ The Document Ingestion Router is a standalone, open-source **MCP server** that c
 | **Knowledge Graph** | spaCy NER → PostgreSQL property graph |
 | **16 Connectors** | S3, Azure Blob, GCS, SharePoint, and 12 more |
 | **Compliance** | NIST AI RMF, FedRAMP High, NIST SP 800-60 |
+| **Security** | [Multi-Tenant RBAC](./security.html) |
 
 ---
 
@@ -43,23 +37,23 @@ The Document Ingestion Router is a standalone, open-source **MCP server** that c
 ```mermaid
 flowchart LR
     subgraph Sources["16 Connectors"]
-        S3[S3] 
+        S3[S3]
         Blob[Azure Blob]
         SP[SharePoint]
         More[+ 13 more]
     end
 
     subgraph Router["Document Ingestion Router"]
-        Classify["Classify\n(A / B / C)"]
-        Docling["Docling\n(Class A)"]
-        Unstructured["Unstructured\n(Class B)"]
-        Pandas["Pandas\n(Class C)"]
+        Classify["Classify A / B / C"]
+        Docling["Docling Class A"]
+        Unstructured["Unstructured Class B"]
+        Pandas["Pandas Class C"]
     end
 
-    subgraph Index["TriSearch™ Index"]
-        KW["Keyword\n(tsvector)"]
-        VEC["Vector\n(pgvector)"]
-        GK["Graph\n(Gk NER)"]
+    subgraph Index["TriSearch Index"]
+        KW["Keyword tsvector"]
+        VEC["Vector pgvector"]
+        GK["Graph Gk NER"]
     end
 
     Sources --> Classify
@@ -102,4 +96,4 @@ Open [http://localhost:8082/docs](http://localhost:8082/docs) for the interactiv
 
 MIT — see [LICENSE](https://github.com/derekbmoore/documentIngestionRouter/blob/main/LICENSE).
 
-Commercially supported by [Zimax Networks LC](https://zimax.net). Available on the [Azure Marketplace](https://azuremarketplace.microsoft.com).
+Created by [Derek Brent Moore](https://github.com/derekbmoore). Free for anyone to use.

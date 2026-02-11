@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-page="connectors">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectors — Document Ingestion Router</title>
+    <meta name="description" content="Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/documentIngestionRouter/style.css">
+</head>
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/documentIngestionRouter/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8"/>
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="/documentIngestionRouter/" class="nav-link" data-page="">Home</a>
+<a href="/documentIngestionRouter/architecture.html" class="nav-link" data-page="architecture">Architecture</a>
+<a href="/documentIngestionRouter/getting-started.html" class="nav-link" data-page="getting-started">Getting Started</a>
+<a href="/documentIngestionRouter/classification.html" class="nav-link" data-page="classification">Classification System</a>
+<a href="/documentIngestionRouter/api-reference.html" class="nav-link" data-page="api-reference">API Reference</a>
+<a href="/documentIngestionRouter/trisearch.html" class="nav-link" data-page="trisearch">TriSearch™</a>
+<a href="/documentIngestionRouter/connectors.html" class="nav-link" data-page="connectors">Connectors</a>
+<a href="/documentIngestionRouter/graph-knowledge.html" class="nav-link" data-page="graph-knowledge">Graph Knowledge</a>
+<a href="/documentIngestionRouter/compliance.html" class="nav-link" data-page="compliance">Compliance</a>
+<a href="/documentIngestionRouter/deployment.html" class="nav-link" data-page="deployment">Deployment</a>
+<a href="/documentIngestionRouter/contributing.html" class="nav-link" data-page="contributing">Contributing</a>
+<a href="/documentIngestionRouter/security.html" class="nav-link" data-page="security">Security</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+            <h1 id="enterprise-connectors">Enterprise Connectors</h1>
+<h2 id="overview">Overview</h2>
+<p>The Document Ingestion Router supports <strong>16 enterprise data source connectors</strong> across 5 categories. Each connector implements a unified interface: <code>connect()</code>, <code>list_documents()</code>, <code>fetch_document()</code>, and <code>disconnect()</code>.</p>
+<h2 id="connector-summary">Connector Summary</h2>
+<div class="table-wrap"><table><tr><th>#</th><th>Connector</th><th>Category</th><th>Auth</th><th>Status</th></tr><tr><td>1</td><td><strong>S3</strong></td><td>Cloud Storage</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>2</td><td><strong>Azure Blob</strong></td><td>Cloud Storage</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>3</td><td><strong>GCS</strong></td><td>Cloud Storage</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>4</td><td><strong>SharePoint</strong></td><td>Collaboration</td><td>OAuth</td><td>✅ Implemented</td></tr><tr><td>5</td><td><strong>Google Drive</strong></td><td>Collaboration</td><td>OAuth</td><td>✅ Implemented</td></tr><tr><td>6</td><td><strong>OneDrive</strong></td><td>Collaboration</td><td>OAuth</td><td>✅ Implemented</td></tr><tr><td>7</td><td><strong>Confluence</strong></td><td>Collaboration</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>8</td><td><strong>ServiceNow</strong></td><td>Ticketing</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>9</td><td><strong>Jira</strong></td><td>Ticketing</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>10</td><td><strong>GitHub</strong></td><td>Ticketing</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>11</td><td><strong>Slack</strong></td><td>Messaging</td><td>OAuth</td><td>✅ Implemented</td></tr><tr><td>12</td><td><strong>Teams</strong></td><td>Messaging</td><td>OAuth</td><td>✅ Implemented</td></tr><tr><td>13</td><td><strong>Email</strong></td><td>Messaging</td><td>IMAP</td><td>✅ Implemented</td></tr><tr><td>14</td><td><strong>Database</strong></td><td>Data & Integration</td><td>DSN</td><td>✅ Implemented</td></tr><tr><td>15</td><td><strong>Webhook</strong></td><td>Data & Integration</td><td>API Key</td><td>✅ Implemented</td></tr><tr><td>16</td><td><strong>Local</strong></td><td>Local</td><td>None</td><td>✅ Implemented</td></tr></table></div>
+<h2 id="cloud-storage">Cloud Storage</h2>
+<h3 id="aws-s3">🪣 AWS S3</h3>
+<p>Pull documents from S3 buckets.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>access_key</code></td><td>AWS access key ID</td></tr><tr><td><code>secret_key</code></td><td>AWS secret access key</td></tr><tr><td><code>region</code></td><td>AWS region (default: <code>us-east-1</code>)</td></tr><tr><td><code>bucket</code></td><td>S3 bucket name</td></tr><tr><td><code>prefix</code></td><td>Optional key prefix filter</td></tr></table></div>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;Production S3&quot;,
+  &quot;kind&quot;: &quot;S3&quot;,
+  &quot;config&quot;: {
+    &quot;access_key&quot;: &quot;AKIA...&quot;,
+    &quot;secret_key&quot;: &quot;...&quot;,
+    &quot;bucket&quot;: &quot;my-documents&quot;,
+    &quot;region&quot;: &quot;us-gov-west-1&quot;
+  }
+}</code></pre>
+<h3 id="azure-blob-storage">☁️ Azure Blob Storage</h3>
+<p>Sync from Azure Blob Storage containers.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>connection_string</code></td><td>Azure Storage connection string</td></tr><tr><td><code>container</code></td><td>Blob container name</td></tr></table></div>
+<h3 id="google-cloud-storage">🌩️ Google Cloud Storage</h3>
+<p>Sync from GCS buckets.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>bucket</code></td><td>GCS bucket name</td></tr><tr><td><code>prefix</code></td><td>Optional prefix filter</td></tr></table></div>
+<h2 id="collaboration">Collaboration</h2>
+<h3 id="sharepoint">📂 SharePoint</h3>
+<p>Sync from SharePoint document libraries via OAuth.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>site_url</code></td><td>SharePoint site URL</td></tr><tr><td><code>client_id</code></td><td>Azure AD app client ID</td></tr><tr><td><code>client_secret</code></td><td>Azure AD app client secret</td></tr><tr><td><code>library</code></td><td>Document library name (default: <code>Shared Documents</code>)</td></tr><tr><td><code>site_name</code></td><td>SharePoint site name</td></tr></table></div>
+<h3 id="google-drive">📁 Google Drive</h3>
+<p>Watch and sync Google Drive folders.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>credentials</code></td><td>Google OAuth2 credentials (JSON)</td></tr><tr><td><code>folder_id</code></td><td>Drive folder ID (default: <code>root</code>)</td></tr></table></div>
+<h3 id="onedrive">☁️ OneDrive</h3>
+<p>Sync from OneDrive personal or business.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>client_id</code></td><td>Azure AD application ID</td></tr><tr><td><code>client_secret</code></td><td>Azure AD client secret</td></tr><tr><td><code>tenant_id</code></td><td>Azure AD tenant ID</td></tr><tr><td><code>folder</code></td><td>Folder path (default: <code>root</code>)</td></tr></table></div>
+<h3 id="confluence">📄 Confluence</h3>
+<p>Crawl Confluence spaces and pages.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>url</code></td><td>Confluence instance URL</td></tr><tr><td><code>username</code></td><td>Confluence username</td></tr><tr><td><code>api_token</code></td><td>Confluence API token</td></tr><tr><td><code>space_key</code></td><td>Confluence space key</td></tr></table></div>
+<h2 id="ticketing">Ticketing</h2>
+<h3 id="servicenow">🎫 ServiceNow</h3>
+<p>Sync incidents and knowledge base articles.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>instance_url</code></td><td>ServiceNow instance URL</td></tr><tr><td><code>username</code></td><td>ServiceNow username</td></tr><tr><td><code>password</code></td><td>ServiceNow password</td></tr><tr><td><code>table</code></td><td>ServiceNow table (default: <code>kb_knowledge</code>)</td></tr></table></div>
+<h3 id="jira">🔷 Jira</h3>
+<p>Sync Jira issues and epics.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>url</code></td><td>Jira instance URL</td></tr><tr><td><code>username</code></td><td>Jira username</td></tr><tr><td><code>api_token</code></td><td>Jira API token</td></tr><tr><td><code>jql</code></td><td>JQL query (default: <code>project = PROJ ORDER BY created DESC</code>)</td></tr></table></div>
+<h3 id="github">🐙 GitHub</h3>
+<p>Sync GitHub issues, PRs, and repository files.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>token</code></td><td>GitHub personal access token</td></tr><tr><td><code>repo</code></td><td>Repository (format: <code>owner/repo</code>)</td></tr></table></div>
+<h2 id="messaging">Messaging</h2>
+<h3 id="slack">💬 Slack</h3>
+<p>Archive Slack channels.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>token</code></td><td>Slack Bot OAuth token</td></tr></table></div>
+<h3 id="microsoft-teams">🟦 Microsoft Teams</h3>
+<p>Archive Teams chat history.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>client_id</code></td><td>Azure AD application ID</td></tr><tr><td><code>client_secret</code></td><td>Azure AD client secret</td></tr><tr><td><code>tenant_id</code></td><td>Azure AD tenant ID</td></tr></table></div>
+<h3 id="email-imap">📧 Email (IMAP)</h3>
+<p>Import from IMAP mailboxes (EML/MSG/MBOX).</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>imap_host</code></td><td>IMAP server hostname</td></tr><tr><td><code>username</code></td><td>Email username</td></tr><tr><td><code>password</code></td><td>Email password</td></tr><tr><td><code>folder</code></td><td>Mailbox folder (default: <code>INBOX</code>)</td></tr></table></div>
+<h2 id="data--integration">Data & Integration</h2>
+<h3 id="database">🗄️ Database</h3>
+<p>Execute SQL queries and ingest results.</p>
+<div class="table-wrap"><table><tr><th>Config Key</th><th>Description</th></tr><tr><td><code>dsn</code></td><td>Database connection string (SQLAlchemy format)</td></tr><tr><td><code>query</code></td><td>Optional custom SQL query</td></tr></table></div>
+<h3 id="webhook">🔗 Webhook</h3>
+<p>Receive real-time data pushes. Webhooks are <strong>push-based</strong> — they listen for incoming POST requests at a configured endpoint rather than polling a source.</p>
+<h2 id="local-upload">Local Upload</h2>
+<h3 id="local">📤 Local</h3>
+<p>Direct file upload from local machine. No configuration required — files are uploaded via the <code>/api/v1/ingest</code> endpoint.</p>
+<p><strong>Supported extensions</strong>: <code>.pdf</code>, <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code>, <code>.txt</code>, <code>.csv</code>, <code>.json</code>, <code>.html</code>, <code>.md</code>, <code>.eml</code>, <code>.msg</code>, <code>.parquet</code>, <code>.log</code>, <code>.jsonl</code></p>
+<h2 id="connector-api">Connector API</h2>
+<pre><code class="language-bash"># List all available connector types
+curl http://localhost:8082/api/v1/connectors/available
+
+# Register a connector
+curl -X POST http://localhost:8082/api/v1/connectors \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#x27;{&quot;name&quot;: &quot;My S3&quot;, &quot;kind&quot;: &quot;S3&quot;, &quot;config&quot;: {&quot;bucket&quot;: &quot;docs&quot;}}&#x27;
+
+# List configured connectors
+curl http://localhost:8082/api/v1/connectors
+
+# Test a connector
+curl -X POST http://localhost:8082/api/v1/connectors/abc123/test</code></pre>
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> · MIT License · <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#e6edf3',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#161b22',
+                nodeBkg: '#161b22',
+                nodeTextColor: '#e6edf3',
+                clusterBkg: '#1c2333',
+                clusterBorder: '#30363d',
+            }
+        });
+
+        // Convert code blocks with language-mermaid to mermaid divs
+        document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+        mermaid.run();
+    </script>
+
+    <!-- Syntax highlighting (Prism) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        const currentPage = document.documentElement.dataset.page;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Re-run Prism on dynamic content
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

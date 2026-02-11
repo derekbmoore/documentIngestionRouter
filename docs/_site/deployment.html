@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-page="deployment">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment — Document Ingestion Router</title>
+    <meta name="description" content="Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/documentIngestionRouter/style.css">
+</head>
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/documentIngestionRouter/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8"/>
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="/documentIngestionRouter/" class="nav-link" data-page="">Home</a>
+<a href="/documentIngestionRouter/architecture.html" class="nav-link" data-page="architecture">Architecture</a>
+<a href="/documentIngestionRouter/getting-started.html" class="nav-link" data-page="getting-started">Getting Started</a>
+<a href="/documentIngestionRouter/classification.html" class="nav-link" data-page="classification">Classification System</a>
+<a href="/documentIngestionRouter/api-reference.html" class="nav-link" data-page="api-reference">API Reference</a>
+<a href="/documentIngestionRouter/trisearch.html" class="nav-link" data-page="trisearch">TriSearch™</a>
+<a href="/documentIngestionRouter/connectors.html" class="nav-link" data-page="connectors">Connectors</a>
+<a href="/documentIngestionRouter/graph-knowledge.html" class="nav-link" data-page="graph-knowledge">Graph Knowledge</a>
+<a href="/documentIngestionRouter/compliance.html" class="nav-link" data-page="compliance">Compliance</a>
+<a href="/documentIngestionRouter/deployment.html" class="nav-link" data-page="deployment">Deployment</a>
+<a href="/documentIngestionRouter/contributing.html" class="nav-link" data-page="contributing">Contributing</a>
+<a href="/documentIngestionRouter/security.html" class="nav-link" data-page="security">Security</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+            <h1 id="deployment-guide">Deployment Guide</h1>
+<h2 id="local-development-docker-compose">Local Development (Docker Compose)</h2>
+<p>The fastest way to run the full stack:</p>
+<pre><code class="language-bash">cp .env.example .env
+# Edit .env with your credentials
+docker compose up -d</code></pre>
+<h3 id="services">Services</h3>
+<div class="table-wrap"><table><tr><th>Service</th><th>Image</th><th>Port</th><th>Purpose</th></tr><tr><td><code>postgres</code></td><td><code>pgvector/pgvector:pg16</code></td><td>5432</td><td>PostgreSQL + pgvector + pg_trgm</td></tr><tr><td><code>zep</code></td><td><code>ghcr.io/getzep/zep:latest</code></td><td>8000</td><td>Memory management layer</td></tr><tr><td><code>temporal</code></td><td><code>temporalio/auto-setup:1.24</code></td><td>7233</td><td>Durable workflow orchestration</td></tr><tr><td><code>temporal-ui</code></td><td><code>temporalio/ui:2.26.2</code></td><td>8088</td><td>Temporal workflow dashboard</td></tr><tr><td><code>api</code></td><td>Custom build</td><td>8082</td><td>FastAPI + MCP server</td></tr><tr><td><code>worker</code></td><td>Custom build</td><td>—</td><td>Temporal workflow worker</td></tr><tr><td><code>frontend</code></td><td>Custom build</td><td>3000</td><td>React dashboard</td></tr></table></div>
+<h3 id="verify">Verify</h3>
+<pre><code class="language-bash"># Health check
+curl http://localhost:8082/health
+
+# Readiness (checks DB)
+curl http://localhost:8082/ready
+
+# Temporal UI
+open http://localhost:8088</code></pre>
+<h2 id="environment-variables">Environment Variables</h2>
+<p>All configuration is via environment variables. See <a href="https://github.com/derekbmoore/documentIngestionRouter/blob/main/.env.example"><code>.env.example</code></a> for the full template.</p>
+<h3 id="required">Required</h3>
+<div class="table-wrap"><table><tr><th>Variable</th><th>Description</th><th>Default</th></tr><tr><td><code>POSTGRES_DB</code></td><td>Database name</td><td><code>doc_ingestion</code></td></tr><tr><td><code>POSTGRES_USER</code></td><td>Database user</td><td><code>dir_admin</code></td></tr><tr><td><code>POSTGRES_PASSWORD</code></td><td>Database password</td><td><code>changeme</code></td></tr><tr><td><code>POSTGRES_HOST</code></td><td>Database host</td><td><code>localhost</code></td></tr><tr><td><code>POSTGRES_PORT</code></td><td>Database port</td><td><code>5432</code></td></tr></table></div>
+<h3 id="embeddings-optional">Embeddings (Optional)</h3>
+<div class="table-wrap"><table><tr><th>Variable</th><th>Description</th></tr><tr><td><code>AZURE_OPENAI_ENDPOINT</code></td><td>Azure OpenAI resource URL</td></tr><tr><td><code>AZURE_OPENAI_API_KEY</code></td><td>Azure OpenAI API key</td></tr><tr><td><code>AZURE_OPENAI_EMBEDDING_DEPLOYMENT</code></td><td>Deployment name (default: <code>text-embedding-ada-002</code>)</td></tr></table></div>
+<h3 id="services">Services</h3>
+<div class="table-wrap"><table><tr><th>Variable</th><th>Description</th><th>Default</th></tr><tr><td><code>ZEP_API_URL</code></td><td>Zep memory service URL</td><td><code>http://localhost:8000</code></td></tr><tr><td><code>TEMPORAL_HOST</code></td><td>Temporal server address</td><td><code>localhost:7233</code></td></tr><tr><td><code>TEMPORAL_NAMESPACE</code></td><td>Temporal namespace</td><td><code>default</code></td></tr></table></div>
+<h3 id="security">Security</h3>
+<div class="table-wrap"><table><tr><th>Variable</th><th>Description</th><th>Default</th></tr><tr><td><code>AUTH_REQUIRED</code></td><td>Enable Azure AD auth</td><td><code>false</code></td></tr><tr><td><code>AZURE_AD_TENANT_ID</code></td><td>Azure AD tenant ID</td><td>—</td></tr><tr><td><code>AZURE_AD_CLIENT_ID</code></td><td>Azure AD client ID</td><td>—</td></tr><tr><td><code>FIPS_MODE</code></td><td>Enable FIPS 140-2 mode</td><td><code>false</code></td></tr><tr><td><code>ENCRYPTION_AT_REST</code></td><td>Enable encryption at rest</td><td><code>true</code></td></tr></table></div>
+<h3 id="application">Application</h3>
+<div class="table-wrap"><table><tr><th>Variable</th><th>Description</th><th>Default</th></tr><tr><td><code>LOG_LEVEL</code></td><td>Logging level</td><td><code>INFO</code></td></tr><tr><td><code>DOCLING_ENABLED</code></td><td>Enable Docling engine</td><td><code>true</code></td></tr><tr><td><code>UPLOAD_DIR</code></td><td>Upload directory</td><td><code>/app/uploads</code></td></tr><tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td>Max upload size</td><td><code>500</code></td></tr></table></div>
+<h2 id="database-initialization">Database Initialization</h2>
+<p>The <code>db/init.sql</code> script runs on first startup and installs required extensions:</p>
+<pre><code class="language-sql">CREATE EXTENSION IF NOT EXISTS vector;    -- pgvector
+CREATE EXTENSION IF NOT EXISTS pg_trgm;   -- Trigram similarity</code></pre>
+<p>Tables are created automatically by SQLAlchemy ORM on startup via <code>init_db()</code>.</p>
+<h2 id="docker-images">Docker Images</h2>
+<h3 id="api-server-backenddockerfile">API Server (<code>backend/Dockerfile</code>)</h3>
+<pre><code class="language-dockerfile">FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m spacy download en_core_web_sm
+COPY app/ ./app/
+CMD [&quot;uvicorn&quot;, &quot;app.main:app&quot;, &quot;--host&quot;, &quot;0.0.0.0&quot;, &quot;--port&quot;, &quot;8082&quot;]</code></pre>
+<h3 id="temporal-worker-backenddockerfileworker">Temporal Worker (<code>backend/Dockerfile.worker</code>)</h3>
+<pre><code class="language-dockerfile">FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/ ./app/
+CMD [&quot;python&quot;, &quot;-m&quot;, &quot;app.workflows.worker&quot;]</code></pre>
+<h2 id="production-considerations">Production Considerations</h2>
+<p>> <strong>FedRAMP High</strong> — Production deployments must meet FedRAMP High baseline requirements.</p>
+<h3 id="security-checklist">Security Checklist</h3>
+<ul><li>[ ] Set strong <code>POSTGRES_PASSWORD</code></li><li>[ ] Enable <code>AUTH_REQUIRED=true</code> with Azure AD</li><li>[ ] Configure TLS 1.3 via reverse proxy (nginx, Azure Front Door)</li><li>[ ] Set <code>FIPS_MODE=true</code> for GovCloud</li><li>[ ] Set <code>ENCRYPTION_AT_REST=true</code></li><li>[ ] Restrict CORS origins in <code>main.py</code></li><li>[ ] Enable audit log forwarding to SIEM</li></ul>
+<h3 id="azure-deployment">Azure Deployment</h3>
+<p>For Azure Container Apps or Azure Kubernetes Service:</p>
+<ol><li>Push images to Azure Container Registry</li></ol>
+<ol><li>Configure managed identity for PostgreSQL, Storage, and OpenAI</li></ol>
+<ol><li>Use Azure Key Vault for secrets</li></ol>
+<ol><li>Deploy with Azure Bicep templates (see <code>infra/</code> — upcoming)</li></ol>
+<ol><li>Enable Azure Monitor for observability</li></ol>
+<h3 id="scaling">Scaling</h3>
+<div class="table-wrap"><table><tr><th>Component</th><th>Strategy</th></tr><tr><td>API</td><td>Horizontal scaling (stateless)</td></tr><tr><td>Worker</td><td>Scale with Temporal task queue depth</td></tr><tr><td>PostgreSQL</td><td>Azure Database for PostgreSQL Flexible Server</td></tr><tr><td>Embeddings</td><td>Azure OpenAI rate limiting / quota management</td></tr></table></div>
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> · MIT License · <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#e6edf3',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#161b22',
+                nodeBkg: '#161b22',
+                nodeTextColor: '#e6edf3',
+                clusterBkg: '#1c2333',
+                clusterBorder: '#30363d',
+            }
+        });
+
+        // Convert code blocks with language-mermaid to mermaid divs
+        document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+        mermaid.run();
+    </script>
+
+    <!-- Syntax highlighting (Prism) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        const currentPage = document.documentElement.dataset.page;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Re-run Prism on dynamic content
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

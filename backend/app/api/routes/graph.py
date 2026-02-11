@@ -2,14 +2,16 @@
 Graph Knowledge API — Query the knowledge graph.
 """
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
 from app.db.session import get_db
 from app.graph.knowledge import KnowledgeGraphBuilder
 from app.router.models import GraphQueryResult
+from app.core.security_context import SecurityContext
+from app.api.middleware.auth import get_current_user
+from app.core.audit import AuditEventType, audit_log
 
 router = APIRouter()
 
@@ -18,27 +20,33 @@ router = APIRouter()
 async def query_graph(
     entity: str = Query(..., description="Entity to search for"),
     depth: int = Query(2, ge=1, le=5),
-    tenant_id: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=200),
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Traverse the knowledge graph starting from an entity."""
+    """Traverse the knowledge graph — scoped to user's tenant."""
+    audit_log(
+        AuditEventType.GRAPH_QUERY,
+        action="graph_query",
+        user_id=ctx.user_id,
+        tenant_id=ctx.tenant_id,
+        details={"entity": entity, "depth": depth},
+    )
+
     builder = KnowledgeGraphBuilder(db)
     return await builder.query(
-        entity=entity, depth=depth, tenant_id=tenant_id, limit=limit,
+        entity=entity, depth=depth, tenant_id=ctx.tenant_id, limit=limit,
     )
 
 
 @router.get("/graph/stats")
 async def graph_stats(
-    tenant_id: Optional[str] = None,
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get knowledge graph statistics."""
-    from sqlalchemy import text
-
-    tenant_filter = "WHERE tenant_id = :tid" if tenant_id else ""
-    params = {"tid": tenant_id} if tenant_id else {}
+    """Get knowledge graph statistics — scoped to user's tenant."""
+    tenant_filter = "WHERE tenant_id = :tid"
+    params = {"tid": ctx.tenant_id}
 
     nodes_q = await db.execute(
         text(f"SELECT COUNT(*) FROM graph_nodes {tenant_filter}"), params

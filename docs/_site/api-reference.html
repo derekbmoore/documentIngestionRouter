@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-page="api-reference">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference — Document Ingestion Router</title>
+    <meta name="description" content="Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/documentIngestionRouter/style.css">
+</head>
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/documentIngestionRouter/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8"/>
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="/documentIngestionRouter/" class="nav-link" data-page="">Home</a>
+<a href="/documentIngestionRouter/architecture.html" class="nav-link" data-page="architecture">Architecture</a>
+<a href="/documentIngestionRouter/getting-started.html" class="nav-link" data-page="getting-started">Getting Started</a>
+<a href="/documentIngestionRouter/classification.html" class="nav-link" data-page="classification">Classification System</a>
+<a href="/documentIngestionRouter/api-reference.html" class="nav-link" data-page="api-reference">API Reference</a>
+<a href="/documentIngestionRouter/trisearch.html" class="nav-link" data-page="trisearch">TriSearch™</a>
+<a href="/documentIngestionRouter/connectors.html" class="nav-link" data-page="connectors">Connectors</a>
+<a href="/documentIngestionRouter/graph-knowledge.html" class="nav-link" data-page="graph-knowledge">Graph Knowledge</a>
+<a href="/documentIngestionRouter/compliance.html" class="nav-link" data-page="compliance">Compliance</a>
+<a href="/documentIngestionRouter/deployment.html" class="nav-link" data-page="deployment">Deployment</a>
+<a href="/documentIngestionRouter/contributing.html" class="nav-link" data-page="contributing">Contributing</a>
+<a href="/documentIngestionRouter/security.html" class="nav-link" data-page="security">Security</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+            <h1 id="api-reference">API Reference</h1>
+<p><strong>Base URL</strong>: <code>http://localhost:8082</code></p>
+<p><strong>API Prefix</strong>: <code>/api/v1</code></p>
+<p><strong>Interactive Docs</strong>: <a href="http://localhost:8082/docs">http://localhost:8082/docs</a> (Swagger UI)</p>
+<h2 id="health">Health</h2>
+<h3 id="get-health"><code>GET /health</code></h3>
+<p>Returns service status.</p>
+<pre><code class="language-json">{
+  &quot;status&quot;: &quot;healthy&quot;,
+  &quot;service&quot;: &quot;Document Ingestion Router&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;
+}</code></pre>
+<h3 id="get-ready"><code>GET /ready</code></h3>
+<p>Readiness probe — checks database connectivity.</p>
+<pre><code class="language-json">{
+  &quot;ready&quot;: true,
+  &quot;database&quot;: &quot;connected&quot;
+}</code></pre>
+<h2 id="ingestion">Ingestion</h2>
+<h3 id="post-apiv1ingest"><code>POST /api/v1/ingest</code></h3>
+<p>Upload and ingest a document. The pipeline: classify → extract → embed → index → build graph.</p>
+<p><strong>Request</strong> (multipart/form-data):</p>
+<div class="table-wrap"><table><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr><tr><td><code>file</code></td><td>File</td><td>✅</td><td>Document to ingest</td></tr><tr><td><code>force_class</code></td><td>string</td><td></td><td>Override classification: <code>immutable_truth</code>, <code>ephemeral_stream</code>, <code>operational_pulse</code></td></tr><tr><td><code>tenant_id</code></td><td>string</td><td></td><td>Tenant isolation ID</td></tr><tr><td><code>user_id</code></td><td>string</td><td></td><td>User who uploaded</td></tr></table></div>
+<p><strong>Example:</strong></p>
+<pre><code class="language-bash">curl -X POST http://localhost:8082/api/v1/ingest \
+  -F &quot;file=@report.pdf&quot; \
+  -F &quot;tenant_id=acme-corp&quot;</code></pre>
+<p><strong>Response</strong> (<code>IngestResult</code>):</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;filename&quot;: &quot;report.pdf&quot;,
+  &quot;document_id&quot;: &quot;a1b2c3d4e5f67890&quot;,
+  &quot;chunks_processed&quot;: 24,
+  &quot;message&quot;: &quot;Ingested 24 chunks as immutable_truth&quot;,
+  &quot;classification&quot;: {
+    &quot;data_class&quot;: &quot;immutable_truth&quot;,
+    &quot;reason&quot;: &quot;Extension .pdf → technical document&quot;,
+    &quot;sensitivity_level&quot;: &quot;low&quot;,
+    &quot;data_categories&quot;: [&quot;internal&quot;],
+    &quot;decay_rate&quot;: 0.01,
+    &quot;requires_encryption&quot;: false,
+    &quot;compliance_frameworks&quot;: [],
+    &quot;confidence&quot;: 0.85
+  }
+}</code></pre>
+<h3 id="get-apiv1documents"><code>GET /api/v1/documents</code></h3>
+<p>List ingested documents with optional filtering.</p>
+<div class="table-wrap"><table><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr><tr><td><code>tenant_id</code></td><td>string</td><td></td><td>Filter by tenant</td></tr><tr><td><code>data_class</code></td><td>string</td><td></td><td>Filter by class</td></tr><tr><td><code>limit</code></td><td>int</td><td>50</td><td>Max results</td></tr><tr><td><code>offset</code></td><td>int</td><td>0</td><td>Pagination offset</td></tr></table></div>
+<p><strong>Example:</strong></p>
+<pre><code class="language-bash">curl &quot;http://localhost:8082/api/v1/documents?data_class=immutable_truth&amp;limit=10&quot;</code></pre>
+<h2 id="search">Search</h2>
+<h3 id="get-apiv1search"><code>GET /api/v1/search</code></h3>
+<p>TriSearch™ — unified search across keyword, vector, and graph knowledge.</p>
+<div class="table-wrap"><table><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr><tr><td><code>q</code></td><td>string</td><td><em>required</em></td><td>Search query</td></tr><tr><td><code>mode</code></td><td>string</td><td><code>trisearch</code></td><td><code>keyword</code>, <code>vector</code>, <code>graph</code>, or <code>trisearch</code></td></tr><tr><td><code>tenant_id</code></td><td>string</td><td></td><td>Filter by tenant</td></tr><tr><td><code>limit</code></td><td>int</td><td>20</td><td>Max results (1–100)</td></tr></table></div>
+<p><strong>Example:</strong></p>
+<pre><code class="language-bash">curl &quot;http://localhost:8082/api/v1/search?q=fedramp+controls&amp;mode=trisearch&quot;</code></pre>
+<p><strong>Response</strong> (<code>SearchResponse</code>):</p>
+<pre><code class="language-json">{
+  &quot;query&quot;: &quot;fedramp controls&quot;,
+  &quot;mode&quot;: &quot;trisearch&quot;,
+  &quot;results&quot;: [
+    {
+      &quot;chunk_id&quot;: &quot;a1b2-0003&quot;,
+      &quot;text&quot;: &quot;FedRAMP High requires encryption at rest...&quot;,
+      &quot;score&quot;: 0.032,
+      &quot;source_file&quot;: &quot;nist-controls.pdf&quot;,
+      &quot;data_class&quot;: &quot;immutable_truth&quot;,
+      &quot;search_mode&quot;: &quot;trisearch&quot;
+    }
+  ],
+  &quot;total&quot;: 5,
+  &quot;keyword_count&quot;: 3,
+  &quot;vector_count&quot;: 4,
+  &quot;graph_count&quot;: 2
+}</code></pre>
+<h2 id="connectors">Connectors</h2>
+<h3 id="get-apiv1connectorsavailable"><code>GET /api/v1/connectors/available</code></h3>
+<p>List all 16 available connector types.</p>
+<pre><code class="language-json">{
+  &quot;connectors&quot;: [
+    {
+      &quot;kind&quot;: &quot;S3&quot;,
+      &quot;category&quot;: &quot;cloud_storage&quot;,
+      &quot;icon&quot;: &quot;🪣&quot;,
+      &quot;description&quot;: &quot;Poll AWS S3 buckets for documents&quot;,
+      &quot;supported_extensions&quot;: [&quot;.pdf&quot;, &quot;.docx&quot;, &quot;.xlsx&quot;, &quot;.csv&quot;, &quot;.json&quot;, &quot;.txt&quot;, &quot;.pptx&quot;],
+      &quot;requires_oauth&quot;: false,
+      &quot;requires_api_key&quot;: true
+    }
+  ],
+  &quot;total&quot;: 16
+}</code></pre>
+<h3 id="post-apiv1connectors"><code>POST /api/v1/connectors</code></h3>
+<p>Register a new connector.</p>
+<p><strong>Request</strong> (<code>ConnectorConfig</code>):</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;Production S3 Bucket&quot;,
+  &quot;kind&quot;: &quot;S3&quot;,
+  &quot;config&quot;: {
+    &quot;access_key&quot;: &quot;AKIA...&quot;,
+    &quot;secret_key&quot;: &quot;...&quot;,
+    &quot;bucket&quot;: &quot;my-documents&quot;,
+    &quot;region&quot;: &quot;us-east-1&quot;
+  },
+  &quot;default_class&quot;: &quot;ephemeral_stream&quot;
+}</code></pre>
+<h3 id="get-apiv1connectors"><code>GET /api/v1/connectors</code></h3>
+<p>List configured connectors. Optional <code>tenant_id</code> filter.</p>
+<h3 id="post-apiv1connectorsconnector_idtest"><code>POST /api/v1/connectors/{connector_id}/test</code></h3>
+<p>Test connectivity for a configured connector.</p>
+<pre><code class="language-json">{&quot;status&quot;: &quot;success&quot;, &quot;connector_id&quot;: &quot;abc123&quot;}</code></pre>
+<h2 id="graph-knowledge">Graph Knowledge</h2>
+<h3 id="get-apiv1graphquery"><code>GET /api/v1/graph/query</code></h3>
+<p>Traverse the knowledge graph from an entity.</p>
+<div class="table-wrap"><table><tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr><tr><td><code>entity</code></td><td>string</td><td><em>required</em></td><td>Starting entity to search</td></tr><tr><td><code>depth</code></td><td>int</td><td>2</td><td>Traversal depth (1–5)</td></tr><tr><td><code>tenant_id</code></td><td>string</td><td></td><td>Filter by tenant</td></tr><tr><td><code>limit</code></td><td>int</td><td>50</td><td>Max results (1–200)</td></tr></table></div>
+<p><strong>Example:</strong></p>
+<pre><code class="language-bash">curl &quot;http://localhost:8082/api/v1/graph/query?entity=NIST&amp;depth=2&quot;</code></pre>
+<p><strong>Response</strong> (<code>GraphQueryResult</code>):</p>
+<pre><code class="language-json">{
+  &quot;nodes&quot;: [
+    {&quot;id&quot;: &quot;n001&quot;, &quot;label&quot;: &quot;NIST&quot;, &quot;entity_type&quot;: &quot;ORG&quot;, &quot;properties&quot;: {}},
+    {&quot;id&quot;: &quot;n002&quot;, &quot;label&quot;: &quot;FedRAMP&quot;, &quot;entity_type&quot;: &quot;ORG&quot;, &quot;properties&quot;: {}}
+  ],
+  &quot;edges&quot;: [
+    {&quot;id&quot;: &quot;e001&quot;, &quot;source_id&quot;: &quot;n001&quot;, &quot;target_id&quot;: &quot;n002&quot;,
+     &quot;relationship&quot;: &quot;co_occurs&quot;, &quot;weight&quot;: 3.0}
+  ],
+  &quot;paths&quot;: []
+}</code></pre>
+<h3 id="get-apiv1graphstats"><code>GET /api/v1/graph/stats</code></h3>
+<p>Knowledge graph statistics.</p>
+<pre><code class="language-json">{
+  &quot;total_nodes&quot;: 1234,
+  &quot;total_edges&quot;: 5678,
+  &quot;entity_types&quot;: [
+    {&quot;type&quot;: &quot;ORG&quot;, &quot;count&quot;: 450},
+    {&quot;type&quot;: &quot;PERSON&quot;, &quot;count&quot;: 320},
+    {&quot;type&quot;: &quot;GPE&quot;, &quot;count&quot;: 280}
+  ]
+}</code></pre>
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> · MIT License · <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#e6edf3',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#161b22',
+                nodeBkg: '#161b22',
+                nodeTextColor: '#e6edf3',
+                clusterBkg: '#1c2333',
+                clusterBorder: '#30363d',
+            }
+        });
+
+        // Convert code blocks with language-mermaid to mermaid divs
+        document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+        mermaid.run();
+    </script>
+
+    <!-- Syntax highlighting (Prism) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        const currentPage = document.documentElement.dataset.page;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Re-run Prism on dynamic content
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

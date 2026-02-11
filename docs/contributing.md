@@ -19,7 +19,7 @@ nav_order: 11
 
 ## Welcome
 
-The Document Ingestion Router is **MIT-licensed** open-source software maintained by [Zimax Networks LC](https://zimax.net). Contributions are welcome! This guide covers the dev setup, coding standards, and PR process.
+The Document Ingestion Router is **MIT-licensed** open-source software created by [Derek Brent Moore](https://github.com/derekbmoore). Contributions are welcome! This guide covers the dev setup, coding standards, and PR process.
 
 ---
 

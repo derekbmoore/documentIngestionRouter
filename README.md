@@ -60,6 +60,26 @@ The Document Ingestion Router classifies documents by **truth value**, routes th
 
 ---
 
+## Security
+
+The router implements a **Defense-in-Depth** security model aligned with **NIST AI RMF** and **FedRAMP High**.
+
+1. **4-Layer Context**:
+   - **User Identity** (OIDC + RBAC)
+   - **Tenant Isolation** (Data segregation)
+   - **Project Scope** (Optional isolation)
+   - **ACL Groups** (Team-based access)
+
+2. **Resource Access Policy (RAP)**:
+   - Unified SQL-level filtering for all resources (Docs, Chunks, Graph).
+   - Access Levels: `private`, `team`, `project`, `tenant`.
+
+3. **Audit Logging**:
+   - Structured JSON logs for all access events (`resource.ingest`, `graph.query`).
+   - Automated request context capture via middleware.
+
+---
+
 ## Quick Start
 
 ```bash

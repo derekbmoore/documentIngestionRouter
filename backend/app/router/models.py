@@ -87,15 +87,20 @@ class ChunkMetadata(BaseModel):
     decay_rate: float = 0.5
     sensitivity_level: Optional[str] = None
     data_categories: List[str] = Field(default_factory=list)
-    user_id: Optional[str] = None
-    tenant_id: Optional[str] = None
-    acl_groups: List[str] = Field(default_factory=list)
     element_type: Optional[str] = None
     page: Optional[int] = None
     bbox: Optional[Any] = None
     row_index: Optional[int] = None
     columns: Optional[List[str]] = None
     compliance_frameworks: List[str] = Field(default_factory=list)
+
+    # Security
+    user_id: Optional[str] = None
+    tenant_id: Optional[str] = None
+    project_id: Optional[str] = None
+    access_level: str = "team"
+    acl_groups: List[str] = Field(default_factory=list)
+    tags: List[str] = Field(default_factory=list)
 
 
 class Chunk(BaseModel):
@@ -126,6 +131,8 @@ class IngestResult(BaseModel):
     message: str
     classification: ClassificationResult
     session_id: Optional[str] = None
+    project_id: Optional[str] = None
+    access_level: str = "team"
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +154,8 @@ class SearchResult(BaseModel):
     data_class: str
     metadata: Dict[str, Any] = Field(default_factory=dict)
     search_mode: str = ""
+    project_id: Optional[str] = None
+    access_level: str = "team"
 
 
 class SearchResponse(BaseModel):
@@ -183,6 +192,9 @@ class ConnectorConfig(BaseModel):
     last_sync: Optional[str] = None
     docs_ingested: int = 0
     error_message: Optional[str] = None
+    project_id: Optional[str] = None
+    access_level: str = "team"
+    acl_groups: List[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -194,6 +206,8 @@ class GraphNode(BaseModel):
     label: str
     entity_type: str
     properties: Dict[str, Any] = Field(default_factory=dict)
+    project_id: Optional[str] = None
+    access_level: str = "team"
 
 
 class GraphEdge(BaseModel):
@@ -204,6 +218,8 @@ class GraphEdge(BaseModel):
     relationship: str
     weight: float = 1.0
     properties: Dict[str, Any] = Field(default_factory=dict)
+    project_id: Optional[str] = None
+    access_level: str = "team"
 
 
 class GraphQueryResult(BaseModel):

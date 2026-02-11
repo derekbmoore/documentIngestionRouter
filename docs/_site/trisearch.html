@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-page="trisearch">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriSearch™ — Document Ingestion Router</title>
+    <meta name="description" content="Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/documentIngestionRouter/style.css">
+</head>
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/documentIngestionRouter/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8"/>
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="/documentIngestionRouter/" class="nav-link" data-page="">Home</a>
+<a href="/documentIngestionRouter/architecture.html" class="nav-link" data-page="architecture">Architecture</a>
+<a href="/documentIngestionRouter/getting-started.html" class="nav-link" data-page="getting-started">Getting Started</a>
+<a href="/documentIngestionRouter/classification.html" class="nav-link" data-page="classification">Classification System</a>
+<a href="/documentIngestionRouter/api-reference.html" class="nav-link" data-page="api-reference">API Reference</a>
+<a href="/documentIngestionRouter/trisearch.html" class="nav-link" data-page="trisearch">TriSearch™</a>
+<a href="/documentIngestionRouter/connectors.html" class="nav-link" data-page="connectors">Connectors</a>
+<a href="/documentIngestionRouter/graph-knowledge.html" class="nav-link" data-page="graph-knowledge">Graph Knowledge</a>
+<a href="/documentIngestionRouter/compliance.html" class="nav-link" data-page="compliance">Compliance</a>
+<a href="/documentIngestionRouter/deployment.html" class="nav-link" data-page="deployment">Deployment</a>
+<a href="/documentIngestionRouter/contributing.html" class="nav-link" data-page="contributing">Contributing</a>
+<a href="/documentIngestionRouter/security.html" class="nav-link" data-page="security">Security</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+            <h1 id="trisearch">TriSearch™</h1>
+<h2 id="overview">Overview</h2>
+<p>TriSearch™ is a <strong>triple-modality search engine</strong> that fuses keyword, vector, and graph knowledge results into a single ranked list. This provides comprehensive recall: keyword search catches exact terms, vector search finds semantic meaning, and graph search discovers entity relationships.</p>
+<pre><code class="language-mermaid">flowchart LR
+    Q[&quot;Search Query&quot;] --&gt; KW[&quot;Keyword\n(tsvector)&quot;]
+    Q --&gt; VEC[&quot;Vector\n(pgvector)&quot;]
+    Q --&gt; GK[&quot;Graph\n(Gk NER)&quot;]
+    KW --&gt; RRF[&quot;Reciprocal Rank\nFusion&quot;]
+    VEC --&gt; RRF
+    GK --&gt; RRF
+    RRF --&gt; R[&quot;Ranked Results&quot;]</code></pre>
+<p>> <strong>NIST AI RMF MEASURE 2.1</strong> — Search quality is auditable. Every result includes its <code>search_mode</code> and contributing modality counts.</p>
+<h2 id="search-modes">Search Modes</h2>
+<div class="table-wrap"><table><tr><th>Mode</th><th>Description</th><th>Requirements</th></tr><tr><td><code>keyword</code></td><td>PostgreSQL full-text search only</td><td>None</td></tr><tr><td><code>vector</code></td><td>pgvector cosine similarity only</td><td>Azure OpenAI embeddings</td></tr><tr><td><code>graph</code></td><td>Knowledge graph traversal only</td><td>spaCy NER entities</td></tr><tr><td><code>trisearch</code></td><td>All three fused via RRF</td><td>Best with all three enabled</td></tr></table></div>
+<h2 id="keyword-search">Keyword Search</h2>
+<p>Uses PostgreSQL's built-in full-text search with <code>tsvector</code> / <code>tsquery</code>.</p>
+<ul><li>Chunks are indexed at ingestion time via <code>to_tsvector('english', text)</code></li><li>Queries are parsed with <code>plainto_tsquery('english', query)</code></li><li>Ranking uses <code>ts_rank()</code> for relevance scoring</li><li>Supports PostgreSQL's full English stemming and stop word removal</li></ul>
+<p><strong>Strengths</strong>: Exact term matching, boolean operators, fast for known terminology.</p>
+<h2 id="vector-search">Vector Search</h2>
+<p>Uses <code>pgvector</code> cosine similarity with Azure OpenAI embeddings.</p>
+<div class="table-wrap"><table><tr><th>Setting</th><th>Value</th></tr><tr><td>Embedding model</td><td><code>text-embedding-ada-002</code></td></tr><tr><td>Dimensions</td><td>1536</td></tr><tr><td>Distance metric</td><td>Cosine similarity (<code><=></code> operator)</td></tr><tr><td>Score</td><td><code>1 - cosine_distance</code> (higher = more similar)</td></tr></table></div>
+<p><strong>How it works</strong>:</p>
+<ol><li>Query text is embedded via Azure OpenAI</li></ol>
+<ol><li>pgvector computes cosine distance against all chunk embeddings</li></ol>
+<ol><li>Results are sorted by similarity score</li></ol>
+<p><strong>Strengths</strong>: Semantic understanding, finds related content even with different terminology.</p>
+<p>> Vector search requires <code>AZURE_OPENAI_ENDPOINT</code> and <code>AZURE_OPENAI_API_KEY</code> to be configured. Without these, vector search is disabled and TriSearch operates on keyword + graph only.</p>
+<h2 id="graph-knowledge-search">Graph Knowledge Search</h2>
+<p>Leverages the knowledge graph built during ingestion (see <a href="/documentIngestionRouter/graph-knowledge">Graph Knowledge</a>).</p>
+<p><strong>How it works</strong>:</p>
+<ol><li>Find graph nodes matching the query using PostgreSQL <code>similarity()</code> (trigram matching, threshold > 0.3)</li></ol>
+<ol><li>Traverse edges to discover connected entities</li></ol>
+<ol><li>Return chunks from documents linked to the matched and connected nodes</li></ol>
+<ol><li>Default score: 0.7 for graph-discovered results</li></ol>
+<p><strong>Strengths</strong>: Discovers documents connected through entity relationships, even if the query terms don't appear in the text.</p>
+<h2 id="reciprocal-rank-fusion-rrf">Reciprocal Rank Fusion (RRF)</h2>
+<p>When <code>mode=trisearch</code>, results from all three modalities are fused using <strong>Reciprocal Rank Fusion</strong>.</p>
+<p><strong>Formula</strong>: For each result appearing at rank <em>r</em> in a result list:</p>
+<pre><code>RRF_score = 1 / (k + r)</code></pre>
+<p>Where <code>k = 60</code> (constant to prevent top-ranked items from dominating).</p>
+<p>Scores from all modalities are summed per chunk ID. The final ranking is sorted by accumulated RRF score, giving balanced weight to all three search methods.</p>
+<p><strong>Example</strong>: A chunk appearing at rank 1 in keyword, rank 3 in vector, and rank 5 in graph:</p>
+<pre><code>Score = 1/(60+1) + 1/(60+3) + 1/(60+5) = 0.0164 + 0.0159 + 0.0154 = 0.0477</code></pre>
+<h2 id="usage">Usage</h2>
+<pre><code class="language-bash"># Full TriSearch (recommended)
+curl &quot;http://localhost:8082/api/v1/search?q=compliance+requirements&amp;mode=trisearch&quot;
+
+# Keyword only
+curl &quot;http://localhost:8082/api/v1/search?q=compliance&amp;mode=keyword&quot;
+
+# Vector only
+curl &quot;http://localhost:8082/api/v1/search?q=compliance&amp;mode=vector&quot;
+
+# Graph only
+curl &quot;http://localhost:8082/api/v1/search?q=NIST&amp;mode=graph&quot;
+
+# With tenant filtering
+curl &quot;http://localhost:8082/api/v1/search?q=compliance&amp;mode=trisearch&amp;tenant_id=acme-corp&quot;</code></pre>
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> · MIT License · <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#e6edf3',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#161b22',
+                nodeBkg: '#161b22',
+                nodeTextColor: '#e6edf3',
+                clusterBkg: '#1c2333',
+                clusterBorder: '#30363d',
+            }
+        });
+
+        // Convert code blocks with language-mermaid to mermaid divs
+        document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+        mermaid.run();
+    </script>
+
+    <!-- Syntax highlighting (Prism) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        const currentPage = document.documentElement.dataset.page;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Re-run Prism on dynamic content
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

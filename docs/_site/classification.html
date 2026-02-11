@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" data-page="classification">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification System — Document Ingestion Router</title>
+    <meta name="description" content="Open-source MCP server for intelligent document classification, extraction, and TriSearch™ indexing.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/documentIngestionRouter/style.css">
+</head>
+<body>
+    <!-- Mobile menu toggle -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/documentIngestionRouter/" class="logo">
+                <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="28" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M8 12h16M8 16h12M8 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="24" cy="22" r="5" fill="#58a6ff" opacity="0.8"/>
+                    <path d="M22.5 22l1 1 2-2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Doc Ingestion Router</span>
+                    <span class="logo-sub">Open-Source MCP Server</span>
+                </div>
+            </a>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <a href="/documentIngestionRouter/" class="nav-link" data-page="">Home</a>
+<a href="/documentIngestionRouter/architecture.html" class="nav-link" data-page="architecture">Architecture</a>
+<a href="/documentIngestionRouter/getting-started.html" class="nav-link" data-page="getting-started">Getting Started</a>
+<a href="/documentIngestionRouter/classification.html" class="nav-link" data-page="classification">Classification System</a>
+<a href="/documentIngestionRouter/api-reference.html" class="nav-link" data-page="api-reference">API Reference</a>
+<a href="/documentIngestionRouter/trisearch.html" class="nav-link" data-page="trisearch">TriSearch™</a>
+<a href="/documentIngestionRouter/connectors.html" class="nav-link" data-page="connectors">Connectors</a>
+<a href="/documentIngestionRouter/graph-knowledge.html" class="nav-link" data-page="graph-knowledge">Graph Knowledge</a>
+<a href="/documentIngestionRouter/compliance.html" class="nav-link" data-page="compliance">Compliance</a>
+<a href="/documentIngestionRouter/deployment.html" class="nav-link" data-page="deployment">Deployment</a>
+<a href="/documentIngestionRouter/contributing.html" class="nav-link" data-page="contributing">Contributing</a>
+<a href="/documentIngestionRouter/security.html" class="nav-link" data-page="security">Security</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="https://github.com/derekbmoore/documentIngestionRouter" class="gh-link" target="_blank" rel="noopener">
+                <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                <span>View on GitHub</span>
+            </a>
+            <div class="license-badge">MIT Licensed</div>
+        </div>
+    </aside>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main content -->
+    <main class="content">
+        <article class="article">
+            <h1 id="classification-system">Classification System</h1>
+<h2 id="truth-value-classification">Truth-Value Classification</h2>
+<p>Every document is classified into one of three classes based on its <strong>truth value</strong> — how stable and authoritative the information is over time.</p>
+<div class="table-wrap"><table><tr><th>Class</th><th>Truth Value</th><th>Engine</th><th>Decay Rate</th><th>Confidence</th></tr><tr><td><strong>A</strong></td><td>Immutable Truth</td><td>IBM Docling</td><td>0.01</td><td>0.85</td></tr><tr><td><strong>B</strong></td><td>Ephemeral Stream</td><td>Unstructured.io</td><td>0.50</td><td>0.70</td></tr><tr><td><strong>C</strong></td><td>Operational Pulse</td><td>Pandas</td><td>0.90</td><td>0.70</td></tr></table></div>
+<p>> <strong>NIST AI RMF MANAGE 2.3</strong> — Classification is the first governance step. It determines which extraction engine processes the document and what decay rate governs its relevance over time.</p>
+<h2 id="file-extension-mapping">File Extension Mapping</h2>
+<h3 id="class-a--immutable-truth">Class A — Immutable Truth</h3>
+<p>High-fidelity documents with permanent relevance. Processed by <strong>IBM Docling</strong> for table extraction, layout analysis, and bounding box metadata.</p>
+<div class="table-wrap"><table><tr><th>Extension</th><th>Description</th></tr><tr><td><code>.pdf</code></td><td>PDF documents</td></tr><tr><td><code>.scidoc</code></td><td>Scientific documents</td></tr></table></div>
+<h3 id="class-b--ephemeral-stream">Class B — Ephemeral Stream</h3>
+<p>Narrative and collaborative content with moderate decay. Processed by <strong>Unstructured.io</strong> for semantic chunking.</p>
+<div class="table-wrap"><table><tr><th>Extension</th><th>Description</th></tr><tr><td><code>.pptx</code></td><td>PowerPoint presentations</td></tr><tr><td><code>.docx</code>, <code>.doc</code></td><td>Word documents</td></tr><tr><td><code>.eml</code>, <code>.msg</code></td><td>Email messages</td></tr><tr><td><code>.html</code></td><td>Web pages</td></tr><tr><td><code>.md</code></td><td>Markdown files</td></tr><tr><td><code>.txt</code></td><td>Plain text</td></tr></table></div>
+<h3 id="class-c--operational-pulse">Class C — Operational Pulse</h3>
+<p>Structured operational data with rapid decay. Processed by <strong>Pandas</strong> for native tabular handling.</p>
+<div class="table-wrap"><table><tr><th>Extension</th><th>Description</th></tr><tr><td><code>.csv</code></td><td>Comma-separated values</td></tr><tr><td><code>.parquet</code></td><td>Apache Parquet</td></tr><tr><td><code>.json</code>, <code>.jsonl</code></td><td>JSON / JSON Lines</td></tr><tr><td><code>.xlsx</code></td><td>Excel spreadsheets</td></tr><tr><td><code>.log</code></td><td>Log files</td></tr></table></div>
+<h2 id="keyword-escalation">Keyword Escalation</h2>
+<p>Class B files (<code>.docx</code>, <code>.md</code>, <code>.txt</code>, etc.) are <strong>escalated to Class A</strong> if the filename contains technical keywords indicating immutable content:</p>
+<pre><code>manual, spec, specification, standard, iso, safety, protocol, procedure,
+guideline, regulation, compliance, datasheet, technical, engineering,
+reference, nist, fedramp, stig, cve, policy</code></pre>
+<p><strong>Example</strong>: <code>nist-800-53-controls.docx</code> → escalated from Class B to <strong>Class A</strong>.</p>
+<h2 id="sensitivity-classification-nist-sp-800-60">Sensitivity Classification (NIST SP 800-60)</h2>
+<p>In addition to truth-value classification, every document receives a <strong>sensitivity level</strong> based on filename analysis.</p>
+<div class="table-wrap"><table><tr><th>Level</th><th>Trigger Keywords</th><th>Encryption Required</th></tr><tr><td><strong>High</strong></td><td><code>secret</code>, <code>credential</code>, <code>password</code>, <code>ssn</code>, <code>pii</code>, <code>phi</code>, <code>cui</code></td><td>✅ Yes</td></tr><tr><td><strong>Moderate</strong></td><td><code>proprietary</code>, <code>internal</code>, <code>confidential</code>, <code>draft</code></td><td>No</td></tr><tr><td><strong>Low</strong></td><td>Default</td><td>No</td></tr></table></div>
+<p>> <strong>FedRAMP High</strong> — Documents classified as High sensitivity automatically set <code>requires_encryption = true</code>. AES-256 at-rest encryption is applied per FedRAMP SC-28.</p>
+<h2 id="data-categories">Data Categories</h2>
+<p>Documents are tagged with categories for compliance filtering:</p>
+<div class="table-wrap"><table><tr><th>Category</th><th>Trigger</th><th>Applicable Frameworks</th></tr><tr><td><code>PII</code></td><td><code>pii</code>, <code>ssn</code> in filename</td><td>NIST 800-122, GDPR</td></tr><tr><td><code>PHI</code></td><td><code>phi</code>, <code>hipaa</code> in filename</td><td>HIPAA</td></tr><tr><td><code>CUI</code></td><td><code>cui</code> in filename</td><td>NIST 800-171</td></tr><tr><td><code>SAFETY</code></td><td><code>safety</code> in filename</td><td>NIST AI RMF</td></tr><tr><td><code>PROPRIETARY</code></td><td><code>proprietary</code> in filename</td><td>Trade secret</td></tr><tr><td><code>INTERNAL</code></td><td>Default</td><td>—</td></tr></table></div>
+<h2 id="decay-rates">Decay Rates</h2>
+<p>Decay rates control how document relevance diminishes over time:</p>
+<pre><code>Class A (0.01): ████████████████████████████████ Nearly permanent
+Class B (0.50): ████████████████                 Moderate decay
+Class C (0.90): ████                             Rapid decay</code></pre>
+<p>Lower decay rates mean information stays relevant longer. Class A documents (standards, specifications) maintain relevance almost indefinitely, while Class C operational data (logs, telemetry) rapidly decays.</p>
+<h2 id="force-classification-override">Force Classification Override</h2>
+<p>You can override automatic classification when ingesting:</p>
+<pre><code class="language-bash">curl -X POST http://localhost:8082/api/v1/ingest \
+  -F &quot;file=@meeting-notes.docx&quot; \
+  -F &quot;force_class=immutable_truth&quot;</code></pre>
+<p>Valid values: <code>immutable_truth</code>, <code>ephemeral_stream</code>, <code>operational_pulse</code>.</p>
+        </article>
+        <footer class="footer">
+            <p>Created by <a href="https://github.com/derekbmoore">Derek Brent Moore</a> · MIT License · <a href="https://github.com/derekbmoore/documentIngestionRouter">Source on GitHub</a></p>
+        </footer>
+    </main>
+
+    <!-- Back to top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#e6edf3',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#1f2937',
+                tertiaryColor: '#161b22',
+                background: '#0d1117',
+                mainBkg: '#161b22',
+                nodeBkg: '#161b22',
+                nodeTextColor: '#e6edf3',
+                clusterBkg: '#1c2333',
+                clusterBorder: '#30363d',
+            }
+        });
+
+        // Convert code blocks with language-mermaid to mermaid divs
+        document.querySelectorAll('pre > code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+        mermaid.run();
+    </script>
+
+    <!-- Syntax highlighting (Prism) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+
+    <script>
+        // Active nav link
+        const currentPage = document.documentElement.dataset.page;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+
+        // Mobile menu
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('visible');
+            toggle.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            toggle.classList.remove('active');
+        });
+
+        // Back to top
+        const btn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            btn.classList.toggle('visible', window.scrollY > 400);
+        });
+        btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Re-run Prism on dynamic content
+        Prism.highlightAll();
+    </script>
+</body>
+</html>

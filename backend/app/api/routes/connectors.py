@@ -1,22 +1,29 @@
 """
-Connectors API — Manage 16 enterprise data source connectors.
+Connectors API — Manage enterprise data source connectors.
 """
 
+import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
+from app.db.models import ConnectorRecord
 from app.connectors.registry import CONNECTOR_REGISTRY, get_connector
 from app.router.models import ConnectorConfig, ConnectorKind
+from app.core.security_context import SecurityContext
+from app.api.middleware.auth import get_current_user
+from app.security.access_policy import ResourceAccessPolicy
+from app.core.audit import AuditEventType, audit_log
 
 router = APIRouter()
 
 
 @router.get("/connectors/available")
 async def list_available_connectors():
-    """List all 16 available connector types and their metadata."""
+    """List all available connector types and their metadata."""
     connectors = []
     for kind, cls in CONNECTOR_REGISTRY.items():
         instance = cls()
@@ -28,12 +35,10 @@ async def list_available_connectors():
 @router.post("/connectors")
 async def create_connector(
     config: ConnectorConfig,
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Register a new data source connector."""
-    import uuid
-    from app.db.models import ConnectorRecord
-
+    """Register a new data source connector — scoped to user's tenant."""
     connector_id = config.id or uuid.uuid4().hex[:16]
 
     record = ConnectorRecord(
@@ -44,26 +49,38 @@ async def create_connector(
         config_json=config.config,
         default_class=config.default_class.value,
         sensitivity_level=config.sensitivity_level.value,
-        tenant_id=None,
+        tenant_id=ctx.tenant_id,
+        user_id=ctx.user_id,
+        project_id=ctx.project_id,
+        access_level="team",
+        acl_groups=list(ctx.groups) if ctx.groups else [],
     )
     db.add(record)
     await db.commit()
+
+    audit_log(
+        AuditEventType.CONNECTOR_SYNC,
+        action="create_connector",
+        user_id=ctx.user_id,
+        tenant_id=ctx.tenant_id,
+        resource=connector_id,
+        resource_type="connector",
+        details={"name": config.name, "kind": config.kind.value},
+    )
 
     return {"id": connector_id, "message": f"Connector '{config.name}' created"}
 
 
 @router.get("/connectors")
 async def list_connectors(
-    tenant_id: Optional[str] = None,
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List configured connectors."""
-    from sqlalchemy import select
-    from app.db.models import ConnectorRecord
-
+    """List configured connectors — scoped by ResourceAccessPolicy."""
     query = select(ConnectorRecord)
-    if tenant_id:
-        query = query.where(ConnectorRecord.tenant_id == tenant_id)
+
+    # MANDATORY: Apply ResourceAccessPolicy filter
+    query = ResourceAccessPolicy.build_query_filter(ctx, query, ConnectorRecord)
 
     result = await db.execute(query)
     records = result.scalars().all()
@@ -89,15 +106,16 @@ async def list_connectors(
 @router.post("/connectors/{connector_id}/test")
 async def test_connector(
     connector_id: str,
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Test connectivity for a configured connector."""
-    from sqlalchemy import select
-    from app.db.models import ConnectorRecord
+    """Test connectivity for a configured connector — tenant-scoped."""
+    query = select(ConnectorRecord).where(ConnectorRecord.id == connector_id)
 
-    result = await db.execute(
-        select(ConnectorRecord).where(ConnectorRecord.id == connector_id)
-    )
+    # Apply access filter so users can only test their own connectors
+    query = ResourceAccessPolicy.build_query_filter(ctx, query, ConnectorRecord)
+
+    result = await db.execute(query)
     record = result.scalar_one_or_none()
     if not record:
         raise HTTPException(404, "Connector not found")

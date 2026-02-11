@@ -1,5 +1,5 @@
 """
-Ingestion API — Upload, classify, extract, and index documents.
+Ingestion API — Upload, classify, extract, and index resources.
 """
 
 import uuid
@@ -7,6 +7,7 @@ import structlog
 from typing import Optional
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -16,6 +17,10 @@ from app.router.classifier import get_router
 from app.router.models import DataClass, IngestResult
 from app.graph.knowledge import KnowledgeGraphBuilder
 from app.search.trisearch import TriSearchEngine
+from app.core.security_context import SecurityContext
+from app.api.middleware.auth import get_current_user
+from app.security.access_policy import ResourceAccessPolicy
+from app.core.audit import AuditEventType, audit_log
 
 logger = structlog.get_logger()
 router = APIRouter()
@@ -25,22 +30,34 @@ router = APIRouter()
 async def ingest_document(
     file: UploadFile = File(...),
     force_class: Optional[str] = Form(None),
-    tenant_id: Optional[str] = Form(None),
-    user_id: Optional[str] = Form(None),
+    project_id: Optional[str] = Form(None),
+    team_id: Optional[str] = Form(None),
+    tags: Optional[str] = Form(None),
+    access_level: str = Form("team"),
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Upload and ingest a document.
+    Upload and ingest a resource.
 
     1. Classify by truth value (Class A/B/C)
     2. Extract via appropriate engine (Docling / Unstructured / Pandas)
     3. Generate embeddings
     4. Build knowledge graph entities
     5. Store chunks in PostgreSQL with pgvector
+
+    Security: tenant_id and user_id are injected from the SecurityContext.
     """
     # Read file
     content = await file.read()
     filename = file.filename or "unknown"
+
+    # Validate access_level
+    if access_level not in ("private", "team", "project", "tenant"):
+        raise HTTPException(400, f"Invalid access_level: {access_level}")
+
+    # Parse tags
+    tag_list = [t.strip() for t in tags.split(",")] if tags else []
 
     # Parse force_class
     fc = None
@@ -57,8 +74,8 @@ async def ingest_document(
             content=content,
             filename=filename,
             force_class=fc,
-            user_id=user_id,
-            tenant_id=tenant_id,
+            user_id=ctx.user_id,
+            tenant_id=ctx.tenant_id,
         )
     except Exception as e:
         logger.error("Ingestion failed", filename=filename, error=str(e))
@@ -90,6 +107,9 @@ async def ingest_document(
         except Exception as e:
             logger.warning("Embedding client init failed", error=str(e))
 
+    # Build ACL groups from user context
+    acl_groups = list(ctx.groups) if ctx.groups else []
+
     # Persist document record
     doc = Document(
         id=doc_id,
@@ -100,15 +120,20 @@ async def ingest_document(
         compliance_frameworks=classification.compliance_frameworks,
         decay_rate=classification.decay_rate,
         provenance_id=provenance_id,
-        tenant_id=tenant_id,
-        user_id=user_id,
+        tenant_id=ctx.tenant_id,
+        user_id=ctx.user_id,
+        acl_groups=acl_groups,
+        project_id=project_id or ctx.project_id,
+        team_id=team_id or ctx.team_id,
+        tags=tag_list,
+        access_level=access_level,
         chunk_count=len(chunks),
         file_size_bytes=len(content),
         mime_type=file.content_type,
     )
     db.add(doc)
 
-    # Persist chunks
+    # Persist chunks (inherit security metadata from document)
     for i, chunk in enumerate(chunks):
         embedding = None
         if embedding_func:
@@ -128,7 +153,11 @@ async def ingest_document(
             data_class=classification.data_class.value,
             provenance_id=provenance_id,
             decay_rate=classification.decay_rate,
-            tenant_id=tenant_id,
+            tenant_id=ctx.tenant_id,
+            user_id=ctx.user_id,
+            project_id=project_id or ctx.project_id,
+            access_level=access_level,
+            acl_groups=acl_groups,
             metadata_json={
                 "source_file": filename,
                 "sensitivity": classification.sensitivity_level.value,
@@ -138,10 +167,26 @@ async def ingest_document(
 
     await db.commit()
 
+    # Audit log
+    audit_log(
+        AuditEventType.RESOURCE_INGEST,
+        action="ingest",
+        user_id=ctx.user_id,
+        tenant_id=ctx.tenant_id,
+        project_id=project_id,
+        resource=doc_id,
+        resource_type="document",
+        details={
+            "filename": filename,
+            "chunks": len(chunks),
+            "access_level": access_level,
+        },
+    )
+
     # Build knowledge graph (async, non-blocking)
     try:
         graph_builder = KnowledgeGraphBuilder(db)
-        await graph_builder.build_from_chunks(chunks, doc_id, tenant_id)
+        await graph_builder.build_from_chunks(chunks, doc_id, ctx.tenant_id)
         await db.commit()
     except Exception as e:
         logger.warning("Graph build failed", error=str(e))
@@ -158,18 +203,18 @@ async def ingest_document(
 
 @router.get("/documents")
 async def list_documents(
-    tenant_id: Optional[str] = None,
     data_class: Optional[str] = None,
     limit: int = 50,
     offset: int = 0,
+    ctx: SecurityContext = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List ingested documents with optional filtering."""
-    from sqlalchemy import select
-
+    """List ingested documents — scoped to user's tenant and access level."""
     query = select(Document).order_by(Document.ingested_at.desc())
-    if tenant_id:
-        query = query.where(Document.tenant_id == tenant_id)
+
+    # MANDATORY: Apply ResourceAccessPolicy filter
+    query = ResourceAccessPolicy.build_query_filter(ctx, query, Document)
+
     if data_class:
         query = query.where(Document.data_class == data_class)
     query = query.limit(limit).offset(offset)
@@ -184,6 +229,9 @@ async def list_documents(
                 "filename": d.filename,
                 "data_class": d.data_class,
                 "sensitivity_level": d.sensitivity_level,
+                "access_level": d.access_level,
+                "project_id": d.project_id,
+                "team_id": d.team_id,
                 "chunk_count": d.chunk_count,
                 "file_size_bytes": d.file_size_bytes,
                 "ingested_at": d.ingested_at.isoformat() if d.ingested_at else None,
