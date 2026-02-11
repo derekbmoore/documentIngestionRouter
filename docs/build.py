@@ -15,6 +15,7 @@ DOCS_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(DOCS_DIR, "_template")
 OUT_DIR = os.path.join(DOCS_DIR, "_site")
 BASE_URL = os.environ.get("BASE_URL", "/documentIngestionRouter")
+SITE_URL = "https://derekbmoore.github.io"
 
 # Page metadata extracted from YAML front matter
 PAGES = []
@@ -278,7 +279,9 @@ def build():
         page_html = template.replace("{{TITLE}}", p["title"])
         page_html = page_html.replace("{{NAV}}", nav_html)
         page_html = page_html.replace("{{CONTENT}}", body_html)
+        page_html = page_html.replace("{{CONTENT}}", body_html)
         page_html = page_html.replace("{{BASE_URL}}", BASE_URL)
+        page_html = page_html.replace("{{SITE_URL}}", SITE_URL)
         page_html = page_html.replace("{{CURRENT_PAGE}}", p["slug"])
 
         out_name = "index.html" if p["slug"] == "" else f'{p["slug"]}.html'
